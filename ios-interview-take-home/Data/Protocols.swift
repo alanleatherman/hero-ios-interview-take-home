@@ -61,6 +61,7 @@ protocol UserRepositoryProtocol {
 protocol ChatInteractorProtocol {
     func loadChats() async
     func sendMessage(_ content: String, to otherUserName: String) async
+    func markChatAsRead(_ chat: Chat) async
 }
 
 protocol UserInteractorProtocol {

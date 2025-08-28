@@ -2,6 +2,7 @@ import Foundation
 
 // MARK: - Chat Interactor
 
+@MainActor
 @Observable
 class ChatInteractor: ChatInteractorProtocol {
     private let repository: ChatRepositoryProtocol
@@ -14,7 +15,6 @@ class ChatInteractor: ChatInteractorProtocol {
     
     // MARK: - ChatInteractorProtocol Implementation
     
-    @MainActor
     func loadChats() async {
         appState.chatState.setLoading(true)
         
@@ -32,7 +32,6 @@ class ChatInteractor: ChatInteractorProtocol {
         }
     }
     
-    @MainActor
     func sendMessage(_ content: String, to otherUserName: String) async {
         do {
             // Send the message through the repository (this handles persistence)
@@ -49,17 +48,27 @@ class ChatInteractor: ChatInteractorProtocol {
     
     // MARK: - Additional Helper Methods
     
-    @MainActor
     func refreshChats() async {
         await loadChats()
     }
     
-    @MainActor
     func clearError() {
         appState.chatState.clearError()
     }
     
-    func getChat(with otherUserName: String) async -> Chat? {
+    func markChatAsRead(_ chat: Chat) async {
+        // Mark the chat as read
+        chat.markAsRead()
+        
+        // Persist the change
+        do {
+            try await repository.saveChat(chat)
+        } catch {
+            print("Failed to save chat read status: \(error.localizedDescription)")
+        }
+    }
+    
+    nonisolated func getChat(with otherUserName: String) async -> Chat? {
         do {
             return try await repository.getChat(with: otherUserName)
         } catch {
@@ -70,7 +79,6 @@ class ChatInteractor: ChatInteractorProtocol {
     
     // MARK: - Private Methods
     
-    @MainActor
     private func loadCachedChatsAsFallback() async {
         do {
             let cachedChats = try await repository.loadCachedChats()
@@ -90,4 +98,5 @@ class ChatInteractor: ChatInteractorProtocol {
 class StubChatInteractor: ChatInteractorProtocol {
     func loadChats() async {}
     func sendMessage(_ content: String, to otherUserName: String) async {}
+    func markChatAsRead(_ chat: Chat) async {}
 }

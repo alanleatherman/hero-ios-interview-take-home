@@ -1,25 +1,25 @@
 import SwiftUI
 
 struct ChatScreenView: View {
-    let chat: Chat
+    
     @Environment(\.interactors) private var interactors
     @Environment(\.appState) private var appState
     @Environment(\.dismiss) private var dismiss
+    
     @State private var messageText = ""
     @State private var showingProfile = false
     
+    let chat: Chat
+    
     var body: some View {
         VStack(spacing: 0) {
-            // Custom header with profile info
             ChatHeaderView(
                 chat: chat,
                 onBackTap: { dismiss() },
                 onProfileTap: { showingProfile = true }
             )
             
-            // Messages area with dark background
             ZStack {
-                // Dark background like in screenshots
                 Color.black
                     .ignoresSafeArea()
                 
@@ -53,12 +53,11 @@ struct ChatScreenView: View {
                 }
             }
             
-            // Modern input bar
             ModernInputBarView(
                 text: $messageText,
                 onSend: {
                     let messageToSend = messageText
-                    messageText = "" // Clear immediately for better UX
+                    messageText = ""
                     
                     Task {
                         await interactors.chatInteractor.sendMessage(messageToSend, to: chat.otherUserName)
@@ -71,8 +70,15 @@ struct ChatScreenView: View {
             ProfileDetailView(chat: chat)
         }
         .onAppear {
-            // Mark chat as viewed when screen appears
-            appState.chatState.markChatAsViewed(chat)
+            Task {
+                await interactors.chatInteractor.markChatAsRead(chat)
+            }
+        }
+        .onChange(of: chat.messages.count) { _, _ in
+            // Mark chat as read whenever new messages arrive while user is on this screen
+            Task {
+                await interactors.chatInteractor.markChatAsRead(chat)
+            }
         }
     }
 }

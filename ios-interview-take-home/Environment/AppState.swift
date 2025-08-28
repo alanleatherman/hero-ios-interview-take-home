@@ -17,7 +17,6 @@ class ChatState {
     var isLoading = false
     var error: Error?
     var selectedChat: Chat?
-    var viewedChats: Set<UUID> = [] // Track which chats have been viewed
     
     // Helper computed properties
     var hasError: Bool {
@@ -30,7 +29,7 @@ class ChatState {
     
     var totalUnreadCount: Int {
         chats.reduce(0) { total, chat in
-            total + (hasUnreadMessages(for: chat) ? 1 : 0)
+            total + (chat.hasUnreadMessages ? 1 : 0)
         }
     }
     
@@ -67,16 +66,9 @@ class ChatState {
     }
     
     func markChatAsViewed(_ chat: Chat) {
-        viewedChats.insert(chat.id)
-    }
-    
-    func hasUnreadMessages(for chat: Chat) -> Bool {
-        // Check if chat has messages and hasn't been viewed
-        guard let lastMessage = chat.messages.last,
-              !lastMessage.isFromCurrentUser else {
-            return false
-        }
-        return !viewedChats.contains(chat.id)
+        // This will be called by the ChatScreenView
+        // The actual persistence will be handled by the ChatInteractor
+        chat.markAsRead()
     }
 }
 

@@ -2,6 +2,7 @@ import Foundation
 
 // MARK: - User Interactor
 
+@MainActor
 @Observable
 class UserInteractor: UserInteractorProtocol {
     private let repository: UserRepositoryProtocol
@@ -17,7 +18,7 @@ class UserInteractor: UserInteractorProtocol {
     
     // MARK: - UserInteractorProtocol Implementation
     
-    func hasCompletedOnboarding() async -> Bool {
+    nonisolated func hasCompletedOnboarding() async -> Bool {
         do {
             let completed = try await repository.hasCompletedOnboarding()
             
@@ -36,7 +37,6 @@ class UserInteractor: UserInteractorProtocol {
         }
     }
     
-    @MainActor
     func completeOnboarding(name: String, profileImage: Data?) async {
         isLoading = true
         error = nil
@@ -55,7 +55,7 @@ class UserInteractor: UserInteractorProtocol {
         }
     }
     
-    func getUserProfile() async -> UserProfile? {
+    nonisolated func getUserProfile() async -> UserProfile? {
         do {
             let profile = try await repository.getUserProfile()
             await MainActor.run {
@@ -73,7 +73,6 @@ class UserInteractor: UserInteractorProtocol {
     
     // MARK: - Additional Helper Methods
     
-    @MainActor
     func loadUserProfile() async {
         isLoading = true
         error = nil
@@ -89,7 +88,6 @@ class UserInteractor: UserInteractorProtocol {
         }
     }
     
-    @MainActor
     func updateProfile(name: String, profileImage: Data?) async {
         isLoading = true
         error = nil
@@ -104,19 +102,18 @@ class UserInteractor: UserInteractorProtocol {
         }
     }
     
-    @MainActor
     func clearError() {
         error = nil
     }
     
     // MARK: - Validation Methods
     
-    func isValidName(_ name: String) -> Bool {
+    nonisolated func isValidName(_ name: String) -> Bool {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         return !trimmedName.isEmpty && trimmedName.count >= 2
     }
     
-    func validateOnboardingData(name: String) -> String? {
+    nonisolated func validateOnboardingData(name: String) -> String? {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmedName.isEmpty {
@@ -130,7 +127,6 @@ class UserInteractor: UserInteractorProtocol {
         return nil // No validation errors
     }
     
-    @MainActor
     func signOut() async {
         isLoading = true
         error = nil
