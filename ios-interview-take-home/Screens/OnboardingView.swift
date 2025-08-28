@@ -11,15 +11,22 @@ struct OnboardingView: View {
         VStack(spacing: Theme.Spacing.xl) {
             Spacer()
             
-            // Welcome section
+            // Welcome section with typewriter animation
             VStack(spacing: Theme.Spacing.md) {
-                Text("Welcome to Messages")
-                    .font(Theme.Typography.largeTitle)
-                    .foregroundColor(Theme.Colors.primaryText)
+                TypewriterText.themed(
+                    "Welcome to Messages",
+                    style: .largeTitle,
+                    color: Theme.Colors.primaryText,
+                    speed: 0.06
+                )
                 
-                Text("What's your name?")
-                    .font(Theme.Typography.title2)
-                    .foregroundColor(Theme.Colors.secondaryText)
+                TypewriterText.themed(
+                    "What's your name?",
+                    style: .title2,
+                    color: Theme.Colors.secondaryText,
+                    speed: 0.08,
+                    startDelay: 1.2
+                )
             }
             
             // Profile setup
