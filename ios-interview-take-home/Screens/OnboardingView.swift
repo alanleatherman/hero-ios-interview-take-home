@@ -8,48 +8,32 @@ struct OnboardingView: View {
     @Environment(\.interactors) private var interactors
     
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: Theme.Spacing.xl) {
             Spacer()
             
             // Welcome section
-            VStack(spacing: 16) {
+            VStack(spacing: Theme.Spacing.md) {
                 Text("Welcome to Messages")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+                    .font(Theme.Typography.largeTitle)
+                    .foregroundColor(Theme.Colors.primaryText)
                 
                 Text("What's your name?")
-                    .font(.title2)
-                    .foregroundColor(.secondary)
+                    .font(Theme.Typography.title2)
+                    .foregroundColor(Theme.Colors.secondaryText)
             }
             
             // Profile setup
-            VStack(spacing: 24) {
-                // Profile image picker
-                Button(action: { showingImagePicker = true }) {
-                    Group {
-                        if let selectedImage = selectedImage {
-                            Image(uiImage: selectedImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } else {
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 80))
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
-                    .overlay(
-                        Circle()
-                            .stroke(Color.blue, lineWidth: 3)
-                    )
-                }
-                .accessibilityLabel("Select profile photo")
+            VStack(spacing: Theme.Spacing.lg) {
+                // Profile image picker with breathing effect
+                ProfileImageButton(
+                    selectedImage: selectedImage,
+                    action: { showingImagePicker = true }
+                )
                 
-                // Name input
+                // Name input with purple accent
                 TextField("Enter your name", text: $name)
-                    .textFieldStyle(.roundedBorder)
-                    .font(.title3)
+                    .textFieldStyle(PurpleTextFieldStyle())
+                    .font(Theme.Typography.title2)
                     .multilineTextAlignment(.center)
                     .accessibilityLabel("Name input field")
             }
@@ -57,23 +41,25 @@ struct OnboardingView: View {
             
             Spacer()
             
-            // Get Chatting button
+            // Get Chatting button with purple theme
             Button(action: completeOnboarding) {
                 Text("Get Chatting")
-                    .font(.headline)
-                    .foregroundColor(.white)
+                    .font(Theme.Typography.headline)
+                    .foregroundColor(Theme.Colors.onPrimary)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(name.isEmpty ? Color.gray : Color.blue)
+                        RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
+                            .fill(name.isEmpty ? Color.gray : Theme.Colors.primary)
                     )
+                    .animation(Theme.Animation.quick, value: name.isEmpty)
             }
             .disabled(name.isEmpty)
-            .padding(.horizontal, 32)
+            .padding(.horizontal, Theme.Spacing.xl)
             .padding(.bottom, 50)
             .accessibilityLabel("Complete onboarding and start chatting")
         }
+        .background(Theme.Colors.background)
         .sheet(isPresented: $showingImagePicker) {
             ProfileImagePicker(selectedImage: $selectedImage)
         }

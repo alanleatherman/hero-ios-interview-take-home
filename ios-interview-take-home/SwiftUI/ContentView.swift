@@ -10,14 +10,17 @@ struct ContentView: View {
         Group {
             if isCheckingOnboarding {
                 // Loading state while checking onboarding status
-                VStack {
+                VStack(spacing: Theme.Spacing.sm) {
                     ProgressView()
                         .scaleEffect(1.5)
+                        .accentColor(Theme.Colors.primary)
                     Text("Loading...")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 8)
+                        .font(Theme.Typography.caption)
+                        .foregroundColor(Theme.Colors.secondaryText)
+                        .padding(.top, Theme.Spacing.sm)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Theme.Colors.background)
             } else if hasCompletedOnboarding {
                 NavigationStack {
                     ChatListView()
