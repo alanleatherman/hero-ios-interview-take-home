@@ -1,59 +1,103 @@
 import Foundation
 import SwiftData
+import OSLog
 
-// MARK: - App Environment
+extension Logger {
+    static let app = Logger(subsystem: Bundle.main.bundleIdentifier ?? "MessagingApp", category: "App")
+}
 
-enum AppEnvironment {
-    case production
-    case staging  
-    case local
+@MainActor
+struct AppEnvironment {
+    let option: Option
+    let appContainer: AppContainer
     
-    static var current: AppEnvironment {
-        #if DEBUG
+    enum Option: String {
+        case preview
+        case local
+        case staging
+        case production
+    }
+    
+    static let current: Option = {
+        #if PREVIEW
+        return .preview
+        #elseif DEBUG
         return .local
         #elseif STAGING
         return .staging
         #else
         return .production
         #endif
+    }()
+}
+
+extension AppEnvironment {
+    static func bootstrap(_ optionOverride: AppEnvironment.Option? = nil) -> AppEnvironment {
+        let option = optionOverride ?? AppEnvironment.current
+        Logger.app.info("Current environment: \(option.rawValue)")
+        
+        switch option {
+        case .preview:
+            return createPreviewEnvironment()
+        case .local:
+            return createLocalEnvironment()
+        case .staging, .production:
+            return createWebEnvironment(option: option)
+        }
     }
     
-    func createContainer(modelContext: ModelContext? = nil) -> AppContainer {
+    private static func createPreviewEnvironment() -> AppEnvironment {
         let appState = AppState()
-        let chatRepository = createChatRepository(modelContext: modelContext)
-        let userRepository = createUserRepository(modelContext: modelContext)
+        let interactors = createPreviewInteractors(appState: appState)
+        let container = AppContainer(appState: appState, interactors: interactors)
         
-        let interactors = AppContainer.Interactors(
-            chatInteractor: ChatInteractor(
-                repository: chatRepository,
-                appState: appState
-            ),
-            userInteractor: UserInteractor(
-                repository: userRepository
-            )
+        return AppEnvironment(option: .preview, appContainer: container)
+    }
+    
+    private static func createLocalEnvironment() -> AppEnvironment {
+        let appState = AppState()
+        let interactors = createPreviewInteractors(appState: appState)
+        let container = AppContainer(appState: appState, interactors: interactors)
+        
+        return AppEnvironment(option: .local, appContainer: container)
+    }
+    
+    private static func createWebEnvironment(option: AppEnvironment.Option) -> AppEnvironment {
+        let appState = AppState()
+        let interactors = createWebInteractors(appState: appState)
+        let container = AppContainer(appState: appState, interactors: interactors)
+        
+        return AppEnvironment(option: option, appContainer: container)
+    }
+    
+    private static func createPreviewInteractors(appState: AppState) -> AppContainer.Interactors {
+        let chatInteractor = ChatInteractor(
+            repository: ChatPreviewRepository(),
+            appState: appState
+        )
+        let userInteractor = UserInteractor(
+            repository: UserPreviewRepository.onboardingNotCompleted
         )
         
-        return AppContainer(appState: appState, interactors: interactors)
+        return AppContainer.Interactors(
+            chatInteractor: chatInteractor,
+            userInteractor: userInteractor
+        )
     }
     
-    private func createChatRepository(modelContext: ModelContext?) -> ChatRepositoryProtocol {
-        switch self {
-        case .production, .staging:
-            return ChatWebRepository(modelContext: modelContext)
-        case .local:
-            // In local development, use web repository with persistence for testing
-            return ChatWebRepository(modelContext: modelContext)
-        }
-    }
-    
-    private func createUserRepository(modelContext: ModelContext?) -> UserRepositoryProtocol {
-        switch self {
-        case .production, .staging:
-            return UserWebRepository(modelContext: modelContext)
-        case .local:
-            // In local development, use web repository with persistence for testing
-            return UserWebRepository(modelContext: modelContext)
-        }
+    private static func createWebInteractors(appState: AppState) -> AppContainer.Interactors {
+        let chatInteractor = ChatInteractor(
+            repository: ChatWebRepository(),
+            appState: appState
+        )
+        let userInteractor = UserInteractor(
+            repository: UserWebRepository()
+        )
+        
+        return AppContainer.Interactors(
+            chatInteractor: chatInteractor,
+            userInteractor: userInteractor
+        )
     }
 }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import SwiftData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -19,8 +20,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // UIKit
 //        window?.rootViewController = ViewController()
         
-        // SwiftUI
-         window?.rootViewController = UIHostingController(rootView: ContentView())
+        // SwiftUI with Environment Bootstrap
+        let environment = AppEnvironment.bootstrap()
+        let contentView = ContentView()
+            .inject(environment.appContainer)
+            .modelContainer(SwiftDataConfiguration.createModelContainer())
+        
+        window?.rootViewController = UIHostingController(rootView: contentView)
         
         window?.makeKeyAndVisible()
     }

@@ -105,3 +105,10 @@ class ChatInteractor: ChatInteractorProtocol {
         }
     }
 }
+
+// MARK: - Stub
+
+class StubChatInteractor: ChatInteractorProtocol {
+    func loadChats() async {}
+    func sendMessage(_ content: String, to otherUserName: String) async {}
+}

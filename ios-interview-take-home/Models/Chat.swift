@@ -36,7 +36,8 @@ extension Chat {
         messages: [
             Message(content: "Hey! How's it going?", isFromCurrentUser: false, timestamp: Date().addingTimeInterval(-3600)),
             Message(content: "Pretty good, thanks for asking!", isFromCurrentUser: true, timestamp: Date().addingTimeInterval(-1800))
-        ]
+        ],
+        profile: Profile(name: "Alice", emoji: "😊", isOnline: true)
     )
     
     static let samples = [
@@ -45,20 +46,23 @@ extension Chat {
             messages: [
                 Message(content: "Hey! How's it going?", isFromCurrentUser: false, timestamp: Date().addingTimeInterval(-3600)),
                 Message(content: "Pretty good, thanks for asking!", isFromCurrentUser: true, timestamp: Date().addingTimeInterval(-1800))
-            ]
+            ],
+            profile: Profile(name: "Alice", emoji: "😊", isOnline: true)
         ),
         Chat(
             otherUserName: "Bob",
             messages: [
                 Message(content: "Did you finish the project?", isFromCurrentUser: false, timestamp: Date().addingTimeInterval(-7200)),
                 Message(content: "Almost done, should be ready tomorrow", isFromCurrentUser: true, timestamp: Date().addingTimeInterval(-3600))
-            ]
+            ],
+            profile: Profile(name: "Bob", emoji: "🤔", isOnline: false)
         ),
         Chat(
             otherUserName: "Charlie",
             messages: [
                 Message(content: "Want to grab lunch later?", isFromCurrentUser: false, timestamp: Date().addingTimeInterval(-1800))
-            ]
+            ],
+            profile: Profile(name: "Charlie", emoji: "😎", isOnline: true)
         )
     ]
 } 
