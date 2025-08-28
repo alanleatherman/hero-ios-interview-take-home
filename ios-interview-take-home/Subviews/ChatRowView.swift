@@ -6,7 +6,6 @@ struct ChatRowView: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Profile emoji avatar
             Circle()
                 .fill(Color(.systemGray5))
                 .frame(width: 50, height: 50)
@@ -46,7 +45,6 @@ struct ChatRowView: View {
                     
                     Spacer()
                     
-                    // Online status indicator
                     if let profile = chat.profile {
                         HStack(spacing: 4) {
                             Circle()

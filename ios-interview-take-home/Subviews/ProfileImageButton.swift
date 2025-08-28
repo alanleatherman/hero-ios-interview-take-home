@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct ProfileImageButton: View {
+    @State private var isBreathing = false
+    
     let selectedImage: UIImage?
     let action: () -> Void
-    
-    @State private var isBreathing = false
     
     var body: some View {
         Button(action: action) {

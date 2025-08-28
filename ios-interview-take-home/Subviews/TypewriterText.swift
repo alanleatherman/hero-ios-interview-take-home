@@ -1,14 +1,14 @@
 import SwiftUI
 
 struct TypewriterText: View {
+    @State private var displayedText = ""
+    @State private var currentIndex = 0
+    
     let text: String
     let font: Font
     let color: Color
     let speed: TimeInterval
     let startDelay: TimeInterval
-    
-    @State private var displayedText = ""
-    @State private var currentIndex = 0
     
     init(
         _ text: String,
