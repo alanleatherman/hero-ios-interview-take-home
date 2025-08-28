@@ -129,6 +129,22 @@ class UserInteractor: UserInteractorProtocol {
         
         return nil // No validation errors
     }
+    
+    @MainActor
+    func signOut() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            try await repository.clearUserProfile()
+            currentUserProfile = nil
+            isLoading = false
+        } catch {
+            self.error = error
+            isLoading = false
+            print("Failed to sign out: \(error.localizedDescription)")
+        }
+    }
 }
 
 // MARK: - Stub
@@ -137,4 +153,5 @@ class StubUserInteractor: UserInteractorProtocol {
     func hasCompletedOnboarding() async -> Bool { return false }
     func completeOnboarding(name: String, profileImage: Data?) async {}
     func getUserProfile() async -> UserProfile? { return nil }
+    func signOut() async {}
 }

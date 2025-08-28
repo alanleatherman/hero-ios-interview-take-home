@@ -32,7 +32,7 @@ struct AppEnvironment {
 }
 
 extension AppEnvironment {
-    static func bootstrap(_ optionOverride: AppEnvironment.Option? = nil) -> AppEnvironment {
+    static func bootstrap(_ optionOverride: AppEnvironment.Option? = nil, modelContext: ModelContext? = nil) -> AppEnvironment {
         let option = optionOverride ?? AppEnvironment.current
         Logger.app.info("Current environment: \(option.rawValue)")
         
@@ -40,9 +40,9 @@ extension AppEnvironment {
         case .preview:
             return createPreviewEnvironment()
         case .local:
-            return createLocalEnvironment()
+            return createLocalEnvironment(modelContext: modelContext)
         case .staging, .production:
-            return createWebEnvironment(option: option)
+            return createWebEnvironment(option: option, modelContext: modelContext)
         }
     }
     
@@ -54,17 +54,17 @@ extension AppEnvironment {
         return AppEnvironment(option: .preview, appContainer: container)
     }
     
-    private static func createLocalEnvironment() -> AppEnvironment {
+    private static func createLocalEnvironment(modelContext: ModelContext? = nil) -> AppEnvironment {
         let appState = AppState()
-        let interactors = createPreviewInteractors(appState: appState)
+        let interactors = createWebInteractors(appState: appState, modelContext: modelContext)
         let container = AppContainer(appState: appState, interactors: interactors)
         
         return AppEnvironment(option: .local, appContainer: container)
     }
     
-    private static func createWebEnvironment(option: AppEnvironment.Option) -> AppEnvironment {
+    private static func createWebEnvironment(option: AppEnvironment.Option, modelContext: ModelContext? = nil) -> AppEnvironment {
         let appState = AppState()
-        let interactors = createWebInteractors(appState: appState)
+        let interactors = createWebInteractors(appState: appState, modelContext: modelContext)
         let container = AppContainer(appState: appState, interactors: interactors)
         
         return AppEnvironment(option: option, appContainer: container)
@@ -85,13 +85,13 @@ extension AppEnvironment {
         )
     }
     
-    private static func createWebInteractors(appState: AppState) -> AppContainer.Interactors {
+    private static func createWebInteractors(appState: AppState, modelContext: ModelContext? = nil) -> AppContainer.Interactors {
         let chatInteractor = ChatInteractor(
-            repository: ChatWebRepository(),
+            repository: ChatWebRepository(modelContext: modelContext),
             appState: appState
         )
         let userInteractor = UserInteractor(
-            repository: UserWebRepository()
+            repository: UserWebRepository(modelContext: modelContext)
         )
         
         return AppContainer.Interactors(

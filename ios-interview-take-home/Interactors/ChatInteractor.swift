@@ -50,8 +50,10 @@ class ChatInteractor: ChatInteractorProtocol {
             // Send the message through the repository
             let responseMessage = try await repository.sendMessage(content, to: otherUserName)
             
-            // Reload chats to get the updated state including the response
-            await loadChats()
+            // Add the response message if we got one
+            if let chatIndex = appState.chatState.chats.firstIndex(where: { $0.otherUserName == otherUserName }) {
+                appState.chatState.chats[chatIndex].messages.append(responseMessage)
+            }
             
         } catch {
             // Remove the optimistic message on failure

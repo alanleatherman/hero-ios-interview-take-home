@@ -27,18 +27,39 @@ struct ContentView: View {
                 }
             } else {
                 OnboardingView(onComplete: {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        hasCompletedOnboarding = true
+                    Task {
+                        await checkOnboardingStatus()
                     }
                 })
             }
         }
         .task {
             // Check onboarding status on app launch
-            hasCompletedOnboarding = await interactors.userInteractor.hasCompletedOnboarding()
-            withAnimation(.easeInOut(duration: 0.3)) {
-                isCheckingOnboarding = false
+            await checkOnboardingStatus()
+        }
+        .onChange(of: appState.userState.hasCompletedOnboarding) { _, newValue in
+            // React to changes in onboarding status (like sign out)
+            if !newValue && hasCompletedOnboarding {
+                // User signed out, reset to onboarding
+                hasCompletedOnboarding = false
             }
+        }
+    }
+    
+    private func checkOnboardingStatus() async {
+        hasCompletedOnboarding = await interactors.userInteractor.hasCompletedOnboarding()
+        
+        // Sync with app state
+        if hasCompletedOnboarding {
+            if let userProfile = await interactors.userInteractor.getUserProfile() {
+                appState.userState.userName = userProfile.name
+                appState.userState.profileImage = userProfile.profileImage
+                appState.userState.hasCompletedOnboarding = true
+            }
+        }
+        
+        withAnimation(.easeInOut(duration: 0.3)) {
+            isCheckingOnboarding = false
         }
     }
 }

@@ -68,4 +68,23 @@ class UserWebRepository: UserRepositoryProtocol {
             throw UserError.profileLoadFailure(error)
         }
     }
+    
+    func clearUserProfile() async throws {
+        guard let modelContext = modelContext else {
+            throw UserError.profileSaveFailure(NSError(domain: "UserRepository", code: 1, userInfo: [NSLocalizedDescriptionKey: "Model context not available"]))
+        }
+        
+        do {
+            let descriptor = FetchDescriptor<UserProfile>()
+            let profiles = try modelContext.fetch(descriptor)
+            
+            for profile in profiles {
+                modelContext.delete(profile)
+            }
+            
+            try modelContext.save()
+        } catch {
+            throw UserError.profileSaveFailure(error)
+        }
+    }
 }

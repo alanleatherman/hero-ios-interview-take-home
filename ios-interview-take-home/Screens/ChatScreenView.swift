@@ -60,6 +60,10 @@ struct ChatScreenView: View {
         .sheet(isPresented: $showingProfile) {
             ProfileDetailView(chat: chat)
         }
+        .onAppear {
+            // Mark chat as viewed when screen appears
+            appState.chatState.markChatAsViewed(chat)
+        }
     }
 }
 

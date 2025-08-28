@@ -94,23 +94,31 @@ class ChatWebRepository: ChatRepositoryProtocol {
     private func addMessage(_ message: Message, to otherUserName: String) async throws {
         if let modelContext = modelContext {
             // SwiftData persistence
-            var chat = try await getChat(with: otherUserName)
+            let descriptor = FetchDescriptor<Chat>(predicate: #Predicate<Chat> { chat in
+                chat.otherUserName == otherUserName
+            })
             
-            if chat == nil {
+            let existingChats = try modelContext.fetch(descriptor)
+            let chat: Chat
+            
+            if let existingChat = existingChats.first {
+                // Use existing chat
+                chat = existingChat
+            } else {
                 // Create new chat if it doesn't exist
-                chat = Chat(otherUserName: otherUserName, messages: [])
-                
-                // Create a profile for the chat
                 let profile = Profile(name: otherUserName, emoji: getRandomEmoji(), isOnline: Bool.random())
-                chat?.profile = profile
+                chat = Chat(otherUserName: otherUserName, messages: [], profile: profile)
                 
-                modelContext.insert(chat!)
                 modelContext.insert(profile)
+                modelContext.insert(chat)
             }
             
+            // Set up the relationship
             message.chat = chat
+            chat.messages.append(message)
+            
+            // Insert the message
             modelContext.insert(message)
-            chat?.messages.append(message)
             
             try modelContext.save()
         } else {
@@ -163,17 +171,33 @@ class ChatWebRepository: ChatRepositoryProtocol {
             ])
         ]
         
-        return sampleData.map { (name, emoji, messages) in
+        var chats: [Chat] = []
+        
+        for (name, emoji, messageData) in sampleData {
             let profile = Profile(name: name, emoji: emoji, isOnline: Bool.random())
-            let chat = Chat(otherUserName: name, messages: messages, profile: profile)
+            let chat = Chat(otherUserName: name, messages: [], profile: profile)
             
-            // Set up relationships
-            for message in messages {
+            // Create messages and set up relationships
+            let messages = messageData.map { messageInfo in
+                let message = Message(content: messageInfo.content, isFromCurrentUser: messageInfo.isFromCurrentUser, timestamp: messageInfo.timestamp)
                 message.chat = chat
+                return message
             }
             
-            return chat
+            chat.messages = messages
+            chats.append(chat)
+            
+            // If we have a model context, insert everything
+            if let modelContext = modelContext {
+                modelContext.insert(profile)
+                modelContext.insert(chat)
+                for message in messages {
+                    modelContext.insert(message)
+                }
+            }
         }
+        
+        return chats
     }
     
     private func setupSampleData() {

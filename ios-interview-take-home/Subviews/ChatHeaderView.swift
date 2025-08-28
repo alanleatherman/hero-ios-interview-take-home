@@ -55,25 +55,11 @@ struct ChatHeaderView: View {
             
             Spacer()
             
-            // Action buttons (like in screenshots)
-            HStack(spacing: Theme.Spacing.md) {
-                Button(action: {}) {
-                    Image(systemName: "phone")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                }
-                
-                Button(action: {}) {
-                    Image(systemName: "video")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                }
-                
-                Button(action: {}) {
-                    Image(systemName: "ellipsis")
-                        .font(.title3)
-                        .foregroundColor(.white)
-                }
+            // Menu button only
+            Button(action: {}) {
+                Image(systemName: "ellipsis")
+                    .font(.title3)
+                    .foregroundColor(.white)
             }
         }
         .padding(.horizontal, Theme.Spacing.md)

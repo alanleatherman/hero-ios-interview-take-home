@@ -42,6 +42,12 @@ class UserPreviewRepository: UserRepositoryProtocol {
         return mockUserProfile
     }
     
+    func clearUserProfile() async throws {
+        // Simulate save delay
+        try? await Task.sleep(for: .milliseconds(100))
+        mockUserProfile = nil
+    }
+    
     // MARK: - Preview Configuration Methods
     
     /// Configure the repository for onboarding preview (user hasn't completed onboarding)

@@ -39,36 +39,17 @@ struct ProfileDetailView: View {
                     }
                 }
                 
-                // Action buttons
-                VStack(spacing: Theme.Spacing.md) {
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "phone.fill")
-                            Text("Call")
-                        }
-                        .font(Theme.Typography.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                .fill(Theme.Colors.primary)
-                        )
-                    }
+                // Message info
+                VStack(spacing: Theme.Spacing.sm) {
+                    Text("\(chat.messages.count) messages")
+                        .font(Theme.Typography.caption)
+                        .foregroundColor(.gray)
                     
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "video.fill")
-                            Text("Video Call")
-                        }
-                        .font(Theme.Typography.headline)
-                        .foregroundColor(Theme.Colors.primary)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: Theme.CornerRadius.medium)
-                                .stroke(Theme.Colors.primary, lineWidth: 2)
-                        )
+                    if let lastMessage = chat.messages.last {
+                        Text("Last message: \(lastMessage.timestamp.formatted(date: .abbreviated, time: .shortened))")
+                            .font(Theme.Typography.caption2)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
                     }
                 }
                 .padding(.horizontal, Theme.Spacing.xl)

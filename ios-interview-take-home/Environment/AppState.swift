@@ -6,6 +6,7 @@ import SwiftUI
 @Observable
 class AppState {
     var chatState = ChatState()
+    var userState = UserState()
 }
 
 // MARK: - Chat State
@@ -16,6 +17,7 @@ class ChatState {
     var isLoading = false
     var error: Error?
     var selectedChat: Chat?
+    var viewedChats: Set<UUID> = [] // Track which chats have been viewed
     
     // Helper computed properties
     var hasError: Bool {
@@ -24,6 +26,12 @@ class ChatState {
     
     var isEmpty: Bool {
         chats.isEmpty && !isLoading
+    }
+    
+    var totalUnreadCount: Int {
+        chats.reduce(0) { total, chat in
+            total + (hasUnreadMessages(for: chat) ? 1 : 0)
+        }
     }
     
     // Methods for state management
@@ -51,10 +59,52 @@ class ChatState {
     
     func selectChat(_ chat: Chat) {
         selectedChat = chat
+        markChatAsViewed(chat)
     }
     
     func clearSelection() {
         selectedChat = nil
+    }
+    
+    func markChatAsViewed(_ chat: Chat) {
+        viewedChats.insert(chat.id)
+    }
+    
+    func hasUnreadMessages(for chat: Chat) -> Bool {
+        // Check if chat has messages and hasn't been viewed
+        guard let lastMessage = chat.messages.last,
+              !lastMessage.isFromCurrentUser else {
+            return false
+        }
+        return !viewedChats.contains(chat.id)
+    }
+}
+
+// MARK: - User State
+
+@Observable
+class UserState {
+    var userName: String = "User"
+    var profileImage: Data?
+    var hasCompletedOnboarding: Bool = false
+    var hasShownTypewriter: Bool = false
+    
+    func updateUserName(_ name: String) {
+        userName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    func updateProfileImage(_ imageData: Data?) {
+        profileImage = imageData
+    }
+    
+    func completeOnboarding(name: String, profileImage: Data?) {
+        updateUserName(name)
+        updateProfileImage(profileImage)
+        hasCompletedOnboarding = true
+    }
+    
+    func markTypewriterShown() {
+        hasShownTypewriter = true
     }
 }
 

@@ -3,9 +3,11 @@ import SwiftUI
 struct UserProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.interactors) private var interactors
-    @State private var userProfile: UserProfile?
+    @Environment(\.appState) private var appState
     @State private var isEditingName = false
     @State private var editedName = ""
+    @State private var showingImagePicker = false
+    @State private var selectedImage: UIImage?
     
     var body: some View {
         NavigationView {
@@ -18,32 +20,39 @@ struct UserProfileView: View {
                     
                     // Profile image section
                     VStack(spacing: Theme.Spacing.lg) {
-                        // Large profile avatar
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 120, height: 120)
-                            .overlay(
-                                Group {
-                                    if let profileImage = userProfile?.profileImage,
-                                       let uiImage = UIImage(data: profileImage) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                    } else {
-                                        Image(systemName: "person.fill")
-                                            .font(.system(size: 60))
-                                            .foregroundColor(.gray)
+                        // Large profile avatar - tappable
+                        Button(action: { showingImagePicker = true }) {
+                            Circle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 120, height: 120)
+                                .overlay(
+                                    Group {
+                                        if let selectedImage = selectedImage {
+                                            Image(uiImage: selectedImage)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                        } else if let profileImage = appState.userState.profileImage,
+                                                  let uiImage = UIImage(data: profileImage) {
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                        } else {
+                                            Image(systemName: "person.fill")
+                                                .font(.system(size: 60))
+                                                .foregroundColor(.gray)
+                                        }
                                     }
-                                }
-                            )
-                            .clipShape(Circle())
-                            .overlay(
-                                Circle()
-                                    .stroke(Theme.Colors.primary, lineWidth: 3)
-                            )
+                                )
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(Theme.Colors.primary, lineWidth: 3)
+                                )
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         
                         Button("Change Photo") {
-                            // TODO: Implement photo picker
+                            showingImagePicker = true
                         }
                         .font(Theme.Typography.caption)
                         .foregroundColor(Theme.Colors.primary)
@@ -66,9 +75,12 @@ struct UserProfileView: View {
                             }
                         } else {
                             HStack {
-                                Text(userProfile?.name ?? "User")
-                                    .font(Theme.Typography.largeTitle)
-                                    .foregroundColor(.white)
+                                Button(action: { startEditingName() }) {
+                                    Text(appState.userState.userName)
+                                        .font(Theme.Typography.largeTitle)
+                                        .foregroundColor(.white)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                                 
                                 Button(action: { startEditingName() }) {
                                     Image(systemName: "pencil")
@@ -88,25 +100,25 @@ struct UserProfileView: View {
                         SettingsRow(
                             icon: "bell",
                             title: "Notifications",
-                            action: {}
-                        )
-                        
-                        SettingsRow(
-                            icon: "moon",
-                            title: "Dark Mode",
-                            action: {}
+                            action: { openAppSettings() }
                         )
                         
                         SettingsRow(
                             icon: "gear",
                             title: "Settings",
-                            action: {}
+                            action: { openAppSettings() }
                         )
                         
                         SettingsRow(
                             icon: "questionmark.circle",
                             title: "Help & Support",
-                            action: {}
+                            action: { showHelpAlert() }
+                        )
+                        
+                        SettingsRow(
+                            icon: "rectangle.portrait.and.arrow.right",
+                            title: "Sign Out",
+                            action: { showSignOutAlert() }
                         )
                     }
                     .padding(.horizontal, Theme.Spacing.xl)
@@ -123,20 +135,69 @@ struct UserProfileView: View {
                 .foregroundColor(Theme.Colors.primary)
             )
         }
-        .task {
-            userProfile = await interactors.userInteractor.getUserProfile()
+        .sheet(isPresented: $showingImagePicker) {
+            ProfileImagePicker(selectedImage: $selectedImage)
+        }
+        .onChange(of: selectedImage) { _, newImage in
+            if let newImage = newImage {
+                let imageData = newImage.jpegData(compressionQuality: 0.8)
+                appState.userState.updateProfileImage(imageData)
+            }
+        }
+        .alert("Help & Support", isPresented: $showingHelpAlert) {
+            Button("OK") {}
+        } message: {
+            Text("Coming soon - reach out for anything you need at support@messages.com")
+        }
+        .alert("Sign Out", isPresented: $showingSignOutAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Sign Out", role: .destructive) {
+                Task {
+                    await signOut()
+                }
+            }
+        } message: {
+            Text("Are you sure you want to sign out? This will clear all your data and return you to the onboarding screen.")
         }
     }
     
     private func startEditingName() {
-        editedName = userProfile?.name ?? ""
+        editedName = appState.userState.userName
         isEditingName = true
     }
     
     private func saveNameChange() {
-        // TODO: Implement name saving
+        appState.userState.updateUserName(editedName)
         isEditingName = false
-        // Update userProfile name locally for now
+    }
+    
+    private func openAppSettings() {
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsUrl)
+        }
+    }
+    
+    @State private var showingHelpAlert = false
+    @State private var showingSignOutAlert = false
+    
+    private func showHelpAlert() {
+        showingHelpAlert = true
+    }
+    
+    private func showSignOutAlert() {
+        showingSignOutAlert = true
+    }
+    
+    private func signOut() async {
+        await interactors.userInteractor.signOut()
+        // Clear app state as well
+        appState.userState.hasCompletedOnboarding = false
+        appState.userState.hasShownTypewriter = false
+        appState.userState.userName = "User"
+        appState.userState.profileImage = nil
+        
+        // Dismiss the profile view
+        dismiss()
     }
 }
 

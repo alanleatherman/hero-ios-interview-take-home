@@ -4,6 +4,21 @@ struct ChatListView: View {
     @Environment(\.appState) private var appState
     @Environment(\.interactors) private var interactors
     @State private var showingProfile = false
+    @State private var selectedTab = "All"
+    
+    private var filteredChats: [Chat] {
+        switch selectedTab {
+        case "New Messages":
+            return appState.chatState.chats.filter { chat in
+                appState.chatState.hasUnreadMessages(for: chat)
+            }
+        case "Groups":
+            // For now, assume no group chats - could be extended later
+            return []
+        default: // "All"
+            return appState.chatState.chats
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -13,7 +28,10 @@ struct ChatListView: View {
             
             VStack(spacing: 0) {
                 // Custom header with user profile (like middle screenshot)
-                ChatListHeaderView(onProfileTap: { showingProfile = true })
+                ChatListHeaderView(
+                    onProfileTap: { showingProfile = true },
+                    selectedTab: $selectedTab
+                )
                 
                 // Main content
                 Group {
@@ -67,8 +85,8 @@ struct ChatListView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: Theme.Spacing.xs) {
-                                ForEach(appState.chatState.chats, id: \.id) { chat in
+                            LazyVStack(spacing: Theme.Spacing.md) {
+                                ForEach(filteredChats, id: \.id) { chat in
                                     NavigationLink(destination: ChatScreenView(chat: chat)) {
                                         ModernChatRowView(chat: chat)
                                     }
@@ -76,6 +94,7 @@ struct ChatListView: View {
                                 }
                             }
                             .padding(.horizontal, Theme.Spacing.md)
+                            .padding(.top, Theme.Spacing.sm)
                         }
                         .refreshable {
                             await interactors.chatInteractor.loadChats()

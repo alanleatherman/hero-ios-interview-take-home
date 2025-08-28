@@ -2,15 +2,17 @@ import SwiftUI
 
 struct ChatListHeaderView: View {
     let onProfileTap: () -> Void
+    @Binding var selectedTab: String
     @State private var currentTime = Date()
+    @Environment(\.appState) private var appState
     
     var body: some View {
         VStack(spacing: Theme.Spacing.md) {
             // Top section with logo and profile
             HStack {
-                // App logo/name (like pesan in screenshot)
+                // App logo/name
                 HStack(spacing: 4) {
-                    Text("pesan")
+                    Text("Messages")
                         .font(.title2)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -30,11 +32,13 @@ struct ChatListHeaderView: View {
                                 .font(.title3)
                                 .foregroundColor(.white)
                             
-                            // Notification badge
-                            Circle()
-                                .fill(Theme.Colors.primary)
-                                .frame(width: 8, height: 8)
-                                .offset(x: 8, y: -8)
+                            // Notification badge - only show if there are unread messages
+                            if appState.chatState.totalUnreadCount > 0 {
+                                Circle()
+                                    .fill(Theme.Colors.primary)
+                                    .frame(width: 8, height: 8)
+                                    .offset(x: 8, y: -8)
+                            }
                         }
                     }
                     
@@ -54,22 +58,34 @@ struct ChatListHeaderView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        TypewriterText.themed(
-                            greetingText,
-                            style: .largeTitle,
-                            color: .white,
-                            speed: 0.08
-                        )
+                        if appState.userState.hasShownTypewriter {
+                            // Show static text after first time
+                            Text(greetingText)
+                                .font(Theme.Typography.largeTitle)
+                                .foregroundColor(.white)
+                            
+                            Text(appState.userState.userName)
+                                .font(Theme.Typography.largeTitle)
+                                .foregroundColor(.white)
+                        } else {
+                            // Show typewriter effect only first time
+                            TypewriterText.themed(
+                                greetingText,
+                                style: .largeTitle,
+                                color: .white,
+                                speed: 0.08
+                            )
+                            
+                            TypewriterText.themed(
+                                appState.userState.userName,
+                                style: .largeTitle,
+                                color: .white,
+                                speed: 0.08,
+                                startDelay: 1.0
+                            )
+                        }
                         
-                        TypewriterText.themed(
-                            "User",
-                            style: .largeTitle,
-                            color: .white,
-                            speed: 0.08,
-                            startDelay: 1.0
-                        )
-                        
-                        Text("32 new messages are coming")
+                        Text(newMessagesText)
                             .font(Theme.Typography.caption)
                             .foregroundColor(.gray)
                     }
@@ -84,14 +100,26 @@ struct ChatListHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            // Filter tabs (like in screenshots)
+            // Filter tabs (removed Calls, added functionality)
             HStack(spacing: Theme.Spacing.sm) {
-                FilterTab(title: "All", isSelected: true)
-                FilterTab(title: "New Messages", isSelected: false)
-                FilterTab(title: "Groups", isSelected: false)
-                FilterTab(title: "Calls", isSelected: false)
+                FilterTab(
+                    title: "All", 
+                    isSelected: selectedTab == "All",
+                    onTap: { selectedTab = "All" }
+                )
+                FilterTab(
+                    title: "New Messages", 
+                    isSelected: selectedTab == "New Messages",
+                    onTap: { selectedTab = "New Messages" }
+                )
+                FilterTab(
+                    title: "Groups", 
+                    isSelected: selectedTab == "Groups",
+                    onTap: { selectedTab = "Groups" }
+                )
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, Theme.Spacing.md)
         }
         .padding(.horizontal, Theme.Spacing.md)
         .padding(.top, Theme.Spacing.sm)
@@ -100,6 +128,13 @@ struct ChatListHeaderView: View {
             // Update time periodically
             Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
                 currentTime = Date()
+            }
+            
+            // Mark typewriter as shown after delay
+            if !appState.userState.hasShownTypewriter {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    appState.userState.markTypewriterShown()
+                }
             }
         }
     }
@@ -122,27 +157,46 @@ struct ChatListHeaderView: View {
         let hour = Calendar.current.component(.hour, from: currentTime)
         return hour >= 6 && hour < 18 ? "sun.max" : "moon.stars"
     }
+    
+    private var newMessagesText: String {
+        let count = appState.chatState.totalUnreadCount
+        if count == 0 {
+            return "All caught up!"
+        } else if count == 1 {
+            return "1 new message"
+        } else {
+            return "\(count) new messages"
+        }
+    }
 }
 
 struct FilterTab: View {
     let title: String
     let isSelected: Bool
+    let onTap: () -> Void
     
     var body: some View {
-        Text(title)
-            .font(Theme.Typography.caption)
-            .fontWeight(isSelected ? .semibold : .regular)
-            .foregroundColor(isSelected ? .white : .gray)
-            .padding(.horizontal, Theme.Spacing.md)
-            .padding(.vertical, Theme.Spacing.xs)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.white.opacity(0.1) : Color.clear)
-            )
+        Button(action: onTap) {
+            Text(title)
+                .font(Theme.Typography.caption)
+                .fontWeight(isSelected ? .semibold : .regular)
+                .foregroundColor(isSelected ? .white : .gray)
+                .padding(.horizontal, Theme.Spacing.md)
+                .padding(.vertical, Theme.Spacing.xs)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(isSelected ? Color.white.opacity(0.1) : Color.clear)
+                )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
 #Preview {
-    ChatListHeaderView(onProfileTap: {})
+    ChatListHeaderView(onProfileTap: {}, selectedTab: .constant("All"))
         .background(Color.black)
+        .inject(AppContainer(
+            appState: AppState(),
+            interactors: .stub
+        ))
 }

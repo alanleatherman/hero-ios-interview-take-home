@@ -53,6 +53,7 @@ protocol UserRepositoryProtocol {
     func hasCompletedOnboarding() async throws -> Bool
     func saveUserProfile(name: String, profileImage: Data?) async throws
     func getUserProfile() async throws -> UserProfile?
+    func clearUserProfile() async throws
 }
 
 // MARK: - Interactor Protocols
@@ -66,4 +67,5 @@ protocol UserInteractorProtocol {
     func hasCompletedOnboarding() async -> Bool
     func completeOnboarding(name: String, profileImage: Data?) async
     func getUserProfile() async -> UserProfile?
+    func signOut() async
 }

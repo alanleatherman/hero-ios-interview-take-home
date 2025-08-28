@@ -21,10 +21,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        window?.rootViewController = ViewController()
         
         // SwiftUI with Environment Bootstrap
-        let environment = AppEnvironment.bootstrap()
+        let modelContainer = SwiftDataConfiguration.createModelContainer()
+        let modelContext = ModelContext(modelContainer)
+        let environment = AppEnvironment.bootstrap(modelContext: modelContext)
         let contentView = ContentView()
             .inject(environment.appContainer)
-            .modelContainer(SwiftDataConfiguration.createModelContainer())
+            .modelContainer(modelContainer)
         
         window?.rootViewController = UIHostingController(rootView: contentView)
         

@@ -6,6 +6,7 @@ struct OnboardingView: View {
     @State private var selectedImage: UIImage?
     @State private var showingImagePicker = false
     @Environment(\.interactors) private var interactors
+    @Environment(\.appState) private var appState
     
     var body: some View {
         VStack(spacing: Theme.Spacing.xl) {
@@ -75,7 +76,13 @@ struct OnboardingView: View {
     private func completeOnboarding() {
         Task {
             let imageData = selectedImage?.jpegData(compressionQuality: 0.8)
+            
+            // Update app state immediately
+            appState.userState.completeOnboarding(name: name, profileImage: imageData)
+            
+            // Also save to persistent storage
             await interactors.userInteractor.completeOnboarding(name: name, profileImage: imageData)
+            
             onComplete()
         }
     }

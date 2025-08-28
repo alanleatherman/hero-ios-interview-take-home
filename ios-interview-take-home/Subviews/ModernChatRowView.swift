@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ModernChatRowView: View {
     let chat: Chat
+    @Environment(\.appState) private var appState
     
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
@@ -52,9 +53,9 @@ struct ModernChatRowView: View {
                         
                         Spacer()
                         
-                        // Unread count badge (fake for demo)
-                        if Bool.random() {
-                            Text("\(Int.random(in: 1...5))")
+                        // Unread count badge - show 1 if there are unread messages
+                        if appState.chatState.hasUnreadMessages(for: chat) {
+                            Text("1")
                                 .font(.caption2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
