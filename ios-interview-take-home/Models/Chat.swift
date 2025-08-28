@@ -19,6 +19,16 @@ final class Chat {
         self.messages = messages
         self.profile = profile
     }
+    
+    // Computed property to get messages sorted by timestamp (oldest first)
+    var sortedMessages: [Message] {
+        messages.sorted { $0.timestamp < $1.timestamp }
+    }
+    
+    // Computed property to get the last message (most recent)
+    var lastMessage: Message? {
+        messages.max { $0.timestamp < $1.timestamp }
+    }
 }
 
 // MARK: - Backward Compatibility

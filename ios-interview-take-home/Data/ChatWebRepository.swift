@@ -48,8 +48,10 @@ class ChatWebRepository: ChatRepositoryProtocol {
     
     func sendMessage(_ content: String, to otherUserName: String) async throws -> Message {
         do {
-            // Create the user's message
-            let message = Message(content: content, isFromCurrentUser: true, timestamp: Date())
+            let now = Date()
+            
+            // Create the user's message with current timestamp
+            let message = Message(content: content, isFromCurrentUser: true, timestamp: now)
             
             // Add message to chat
             try await addMessage(message, to: otherUserName)
@@ -59,7 +61,8 @@ class ChatWebRepository: ChatRepositoryProtocol {
             
             // Get fake response
             let fakeResponse = await getFakeResponse(for: content)
-            let responseMessage = Message(content: fakeResponse, isFromCurrentUser: false, timestamp: Date())
+            // Ensure response message has a later timestamp
+            let responseMessage = Message(content: fakeResponse, isFromCurrentUser: false, timestamp: now.addingTimeInterval(2))
             
             // Add response message
             try await addMessage(responseMessage, to: otherUserName)

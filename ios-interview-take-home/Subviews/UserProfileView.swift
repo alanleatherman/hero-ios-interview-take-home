@@ -141,7 +141,14 @@ struct UserProfileView: View {
         .onChange(of: selectedImage) { _, newImage in
             if let newImage = newImage {
                 let imageData = newImage.jpegData(compressionQuality: 0.8)
+                // Update both AppState and persist through UserInteractor
                 appState.userState.updateProfileImage(imageData)
+                Task {
+                    await interactors.userInteractor.updateProfile(
+                        name: appState.userState.userName,
+                        profileImage: imageData
+                    )
+                }
             }
         }
         .alert("Help & Support", isPresented: $showingHelpAlert) {
@@ -169,6 +176,14 @@ struct UserProfileView: View {
     private func saveNameChange() {
         appState.userState.updateUserName(editedName)
         isEditingName = false
+        
+        // Persist the name change through UserInteractor
+        Task {
+            await interactors.userInteractor.updateProfile(
+                name: editedName,
+                profileImage: appState.userState.profileImage
+            )
+        }
     }
     
     private func openAppSettings() {

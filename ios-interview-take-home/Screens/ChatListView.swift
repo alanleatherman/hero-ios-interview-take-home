@@ -7,16 +7,23 @@ struct ChatListView: View {
     @State private var selectedTab = "All"
     
     private var filteredChats: [Chat] {
+        let sortedChats = appState.chatState.chats.sorted { chat1, chat2 in
+            // Sort by most recent message timestamp (newest first)
+            let lastMessage1 = chat1.lastMessage
+            let lastMessage2 = chat2.lastMessage
+            return (lastMessage1?.timestamp ?? Date.distantPast) > (lastMessage2?.timestamp ?? Date.distantPast)
+        }
+        
         switch selectedTab {
         case "New Messages":
-            return appState.chatState.chats.filter { chat in
+            return sortedChats.filter { chat in
                 appState.chatState.hasUnreadMessages(for: chat)
             }
         case "Groups":
             // For now, assume no group chats - could be extended later
             return []
         default: // "All"
-            return appState.chatState.chats
+            return sortedChats
         }
     }
     
@@ -109,6 +116,12 @@ struct ChatListView: View {
         }
         .task {
             await interactors.chatInteractor.loadChats()
+            
+            // Also load user profile to ensure profile image is up to date
+            if let userProfile = await interactors.userInteractor.getUserProfile() {
+                appState.userState.userName = userProfile.name
+                appState.userState.profileImage = userProfile.profileImage
+            }
         }
     }
 }

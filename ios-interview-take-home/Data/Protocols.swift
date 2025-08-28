@@ -67,5 +67,6 @@ protocol UserInteractorProtocol {
     func hasCompletedOnboarding() async -> Bool
     func completeOnboarding(name: String, profileImage: Data?) async
     func getUserProfile() async -> UserProfile?
+    func updateProfile(name: String, profileImage: Data?) async
     func signOut() async
 }

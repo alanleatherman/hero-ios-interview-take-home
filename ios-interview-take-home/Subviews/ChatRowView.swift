@@ -23,7 +23,7 @@ struct ChatRowView: View {
                     
                     Spacer()
                     
-                    if let lastMessage = chat.messages.last {
+                    if let lastMessage = chat.lastMessage {
                         Text(formatTime(lastMessage.timestamp))
                             .font(.caption)
                             .foregroundColor(.secondary)
@@ -31,7 +31,7 @@ struct ChatRowView: View {
                 }
                 
                 HStack {
-                    if let lastMessage = chat.messages.last {
+                    if let lastMessage = chat.lastMessage {
                         Text(lastMessage.content)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -91,8 +91,8 @@ struct ChatRowView: View {
     
     private var accessibilityText: String {
         let onlineStatus = chat.profile?.isOnline == true ? "online" : "offline"
-        let lastMessageText = chat.messages.last?.content ?? "No messages"
-        let timeText = chat.messages.last.map { formatTime($0.timestamp) } ?? ""
+        let lastMessageText = chat.lastMessage?.content ?? "No messages"
+        let timeText = chat.lastMessage.map { formatTime($0.timestamp) } ?? ""
         
         return "Chat with \(chat.otherUserName), \(onlineStatus). Last message: \(lastMessageText). \(timeText)"
     }

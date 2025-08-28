@@ -26,7 +26,7 @@ struct ChatScreenView: View {
                 ScrollViewReader { proxy in
                     ScrollView {
                         LazyVStack(spacing: Theme.Spacing.sm) {
-                            ForEach(chat.messages, id: \.id) { message in
+                            ForEach(chat.sortedMessages, id: \.id) { message in
                                 MessageBubbleView(message: message)
                                     .transition(.move(edge: .bottom).combined(with: .opacity))
                                     .animation(Theme.Animation.standard, value: chat.messages.count)
@@ -35,8 +35,16 @@ struct ChatScreenView: View {
                         .padding(.horizontal, Theme.Spacing.md)
                         .padding(.vertical, Theme.Spacing.sm)
                     }
+                    .onAppear {
+                        // Scroll to bottom when view appears
+                        if let lastMessage = chat.lastMessage {
+                            DispatchQueue.main.async {
+                                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+                            }
+                        }
+                    }
                     .onChange(of: chat.messages.count) { _, _ in
-                        if let lastMessage = chat.messages.last {
+                        if let lastMessage = chat.lastMessage {
                             withAnimation(Theme.Animation.standard) {
                                 proxy.scrollTo(lastMessage.id, anchor: .bottom)
                             }
@@ -49,9 +57,11 @@ struct ChatScreenView: View {
             ModernInputBarView(
                 text: $messageText,
                 onSend: {
+                    let messageToSend = messageText
+                    messageText = "" // Clear immediately for better UX
+                    
                     Task {
-                        await interactors.chatInteractor.sendMessage(messageText, to: chat.otherUserName)
-                        messageText = ""
+                        await interactors.chatInteractor.sendMessage(messageToSend, to: chat.otherUserName)
                     }
                 }
             )

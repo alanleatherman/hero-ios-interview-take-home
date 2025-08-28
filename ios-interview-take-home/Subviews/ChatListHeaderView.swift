@@ -47,9 +47,20 @@ struct ChatListHeaderView: View {
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 32, height: 32)
                             .overlay(
-                                Text("👤")
-                                    .font(.caption)
+                                Group {
+                                    if let profileImage = appState.userState.profileImage,
+                                       let uiImage = UIImage(data: profileImage) {
+                                        Image(uiImage: uiImage)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                    } else {
+                                        Image(systemName: "person.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
                             )
+                            .clipShape(Circle())
                     }
                 }
             }

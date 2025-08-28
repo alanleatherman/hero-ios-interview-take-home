@@ -34,37 +34,14 @@ class ChatInteractor: ChatInteractorProtocol {
     
     @MainActor
     func sendMessage(_ content: String, to otherUserName: String) async {
-        // Optimistically add the message to the UI
-        let optimisticMessage = Message(
-            content: content,
-            isFromCurrentUser: true,
-            timestamp: Date()
-        )
-        
-        // Find the chat and add the message optimistically
-        if let chatIndex = appState.chatState.chats.firstIndex(where: { $0.otherUserName == otherUserName }) {
-            appState.chatState.chats[chatIndex].messages.append(optimisticMessage)
-        }
-        
         do {
-            // Send the message through the repository
-            let responseMessage = try await repository.sendMessage(content, to: otherUserName)
+            // Send the message through the repository (this handles persistence)
+            _ = try await repository.sendMessage(content, to: otherUserName)
             
-            // Add the response message if we got one
-            if let chatIndex = appState.chatState.chats.firstIndex(where: { $0.otherUserName == otherUserName }) {
-                appState.chatState.chats[chatIndex].messages.append(responseMessage)
-            }
+            // Reload chats to get the updated state with both messages
+            await loadChats()
             
         } catch {
-            // Remove the optimistic message on failure
-            if let chatIndex = appState.chatState.chats.firstIndex(where: { $0.otherUserName == otherUserName }) {
-                appState.chatState.chats[chatIndex].messages.removeAll { message in
-                    message.content == content && 
-                    message.isFromCurrentUser && 
-                    abs(message.timestamp.timeIntervalSince(optimisticMessage.timestamp)) < 1.0
-                }
-            }
-            
             appState.chatState.setError(error)
             print("Failed to send message: \(error.localizedDescription)")
         }

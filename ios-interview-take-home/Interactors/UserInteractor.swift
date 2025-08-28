@@ -153,5 +153,6 @@ class StubUserInteractor: UserInteractorProtocol {
     func hasCompletedOnboarding() async -> Bool { return false }
     func completeOnboarding(name: String, profileImage: Data?) async {}
     func getUserProfile() async -> UserProfile? { return nil }
+    func updateProfile(name: String, profileImage: Data?) async {}
     func signOut() async {}
 }
