@@ -1,5 +1,11 @@
 # iOS Messaging App - Take Home Interview
 
+<img width="200" height="432" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 08 09 50" src="https://github.com/user-attachments/assets/18dcbe6a-6694-42a6-93c6-10b69a753969" />
+<img width="200" height="432" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 18 25" src="https://github.com/user-attachments/assets/0f401e40-60f9-430f-8fd8-24e5b6bf98e5" />
+<img width="200" height="432" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 33 09" src="https://github.com/user-attachments/assets/07680563-3166-47c0-ac14-45621b73fcbf" />
+<img width="200" height="432" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 34 14" src="https://github.com/user-attachments/assets/36a33e2a-a49d-4b2c-b286-a2fdb9d6af72" />
+
+
 A modern iOS messaging application built with SwiftUI and SwiftData, featuring real-time messaging simulation, persistent data storage, and a clean architecture pattern.
 
 ## Features

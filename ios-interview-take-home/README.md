@@ -1,5 +1,14 @@
 # iOS Messaging App - Take Home Interview
 
+<img width="201" height="655" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 08 09 50" src="https://github.com/user-attachments/assets/18ffe707-6f3e-4ad6-bc69-d099500d0e28" />
+
+<img width="201" height="655" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 32 56" src="https://github.com/user-attachments/assets/5775e82f-a515-4136-ac17-678e8f7f4b7a" />
+
+<img width="201" height="655" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 33 09" src="https://github.com/user-attachments/assets/612d30a9-1488-4ea1-9900-34bf45d4e4c2" />
+
+<img width="201" height="655" alt="Simulator Screenshot - iPhone 16 Pro - 2025-08-29 at 07 34 14" src="https://github.com/user-attachments/assets/576ea9eb-1202-4058-b2fa-667b5be5e627" />
+
+
 A modern iOS messaging application built with SwiftUI and SwiftData, featuring real-time messaging simulation, persistent data storage, and a clean architecture pattern.
 
 ## Features
@@ -105,6 +114,8 @@ The project includes unit tests for core business logic:
 Given more time, the following features would enhance the application:
 
 ### Immediate Improvements (1-2 hours)
+- **Clean up and more verification**: Also potentially rearranging some of the flows of the architecture, More debugging / instruments run throughs for stability (other devices as well)
+- **More delightful animations / UIUX**: Also actually implementing some features like mic and photo in chat
 - **Message Search**: Search functionality across all conversations
 - **Message Timestamps**: Detailed timestamp display with relative formatting
 - **Typing Indicators**: Show when the bot is "typing" a response
