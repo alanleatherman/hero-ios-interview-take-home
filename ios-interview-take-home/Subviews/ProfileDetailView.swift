@@ -1,15 +1,15 @@
 import SwiftUI
 
 struct ProfileDetailView: View {
-    let chat: Chat
     @Environment(\.dismiss) private var dismiss
+
+    let chat: Chat
     
     var body: some View {
         NavigationView {
             VStack(spacing: Theme.Spacing.xl) {
                 Spacer()
                 
-                // Large profile avatar
                 Circle()
                     .fill(Color.gray.opacity(0.3))
                     .frame(width: 120, height: 120)
@@ -22,7 +22,6 @@ struct ProfileDetailView: View {
                             .stroke(Theme.Colors.primary, lineWidth: 3)
                     )
                 
-                // Profile info
                 VStack(spacing: Theme.Spacing.sm) {
                     Text(chat.otherUserName)
                         .font(Theme.Typography.largeTitle)
@@ -39,7 +38,6 @@ struct ProfileDetailView: View {
                     }
                 }
                 
-                // Message info
                 VStack(spacing: Theme.Spacing.sm) {
                     Text("\(chat.messages.count) messages")
                         .font(Theme.Typography.caption)

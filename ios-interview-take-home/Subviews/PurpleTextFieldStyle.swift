@@ -3,6 +3,7 @@ import SwiftUI
 struct PurpleTextFieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
+            .foregroundColor(Theme.Colors.primaryText)
             .padding(Theme.Spacing.md)
             .background(
                 RoundedRectangle(cornerRadius: Theme.CornerRadius.small)
@@ -12,7 +13,7 @@ struct PurpleTextFieldStyle: TextFieldStyle {
                             .stroke(Theme.Colors.primary.opacity(0.3), lineWidth: 1)
                     )
             )
-            .accentColor(Theme.Colors.primary) // This sets the cursor color to purple
+            .accentColor(Theme.Colors.primary)
             .themeShadow(Theme.Shadows.light)
     }
 }

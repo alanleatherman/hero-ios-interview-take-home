@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ChatScreenView: View {
-    
     @Environment(\.interactors) private var interactors
     @Environment(\.appState) private var appState
     @Environment(\.dismiss) private var dismiss
@@ -36,7 +35,6 @@ struct ChatScreenView: View {
                         .padding(.vertical, Theme.Spacing.sm)
                     }
                     .onAppear {
-                        // Scroll to bottom when view appears
                         if let lastMessage = chat.lastMessage {
                             DispatchQueue.main.async {
                                 proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -75,7 +73,6 @@ struct ChatScreenView: View {
             }
         }
         .onChange(of: chat.messages.count) { _, _ in
-            // Mark chat as read whenever new messages arrive while user is on this screen
             Task {
                 await interactors.chatInteractor.markChatAsRead(chat)
             }

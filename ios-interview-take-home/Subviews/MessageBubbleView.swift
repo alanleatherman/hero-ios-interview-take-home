@@ -24,7 +24,6 @@ struct MessageBubbleView: View {
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, Theme.Spacing.sm)
                 .background(
-                    // Purple gradient like in screenshots
                     LinearGradient(
                         colors: [Theme.Colors.primary, Theme.Colors.primaryLight],
                         startPoint: .topLeading,
@@ -41,7 +40,6 @@ struct MessageBubbleView: View {
                 )
                 .shadow(color: Theme.Colors.primary.opacity(0.3), radius: 4, x: 0, y: 2)
             
-            // Timestamp
             Text(formatTime(message.timestamp))
                 .font(.caption2)
                 .foregroundColor(.gray)
@@ -57,7 +55,6 @@ struct MessageBubbleView: View {
                 .padding(.horizontal, Theme.Spacing.md)
                 .padding(.vertical, Theme.Spacing.sm)
                 .background(
-                    // Dark gray bubble like in screenshots
                     Color.gray.opacity(0.3)
                 )
                 .clipShape(
@@ -70,7 +67,6 @@ struct MessageBubbleView: View {
                 )
                 .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
             
-            // Timestamp
             Text(formatTime(message.timestamp))
                 .font(.caption2)
                 .foregroundColor(.gray)

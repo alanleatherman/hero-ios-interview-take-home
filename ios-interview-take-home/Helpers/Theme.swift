@@ -23,16 +23,16 @@ struct Theme {
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
-        static let receivedMessage = Color(.systemGray6)
+        static let receivedMessage = Color(red: 0.25, green: 0.25, blue: 0.27) // Dark gray
         
-        // Background colors
-        static let background = Color(.systemBackground)
-        static let secondaryBackground = Color(.secondarySystemBackground)
-        static let surface = Color(.systemGray6)
+        // Background colors - Force dark mode
+        static let background = Color.black
+        static let secondaryBackground = Color(red: 0.11, green: 0.11, blue: 0.12) // Dark gray
+        static let surface = Color(red: 0.17, green: 0.17, blue: 0.18) // Slightly lighter dark gray
         
-        // Text colors
-        static let primaryText = Color.primary
-        static let secondaryText = Color.secondary
+        // Text colors - Force dark mode
+        static let primaryText = Color.white
+        static let secondaryText = Color(red: 0.85, green: 0.85, blue: 0.87) // Light gray
         static let onPrimary = Color.white
         
         // Status colors

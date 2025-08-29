@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		FF0307532E61204A0018506D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF4A43502E037CFF004EDA41 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EF4A43572E037CFF004EDA41;
+			remoteInfo = "ios-interview-take-home";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		EF4A43582E037CFF004EDA41 /* ios-interview-take-home.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ios-interview-take-home.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF03074F2E61204A0018506D /* ios-interview-take-homeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ios-interview-take-homeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -29,10 +40,22 @@
 			path = "ios-interview-take-home";
 			sourceTree = "<group>";
 		};
+		FF0307502E61204A0018506D /* ios-interview-take-homeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "ios-interview-take-homeTests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		EF4A43552E037CFF004EDA41 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF03074C2E61204A0018506D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -46,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				EF4A435A2E037CFF004EDA41 /* ios-interview-take-home */,
+				FF0307502E61204A0018506D /* ios-interview-take-homeTests */,
 				EF4A43592E037CFF004EDA41 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -54,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				EF4A43582E037CFF004EDA41 /* ios-interview-take-home.app */,
+				FF03074F2E61204A0018506D /* ios-interview-take-homeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,6 +108,29 @@
 			productReference = EF4A43582E037CFF004EDA41 /* ios-interview-take-home.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FF03074E2E61204A0018506D /* ios-interview-take-homeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF0307552E61204B0018506D /* Build configuration list for PBXNativeTarget "ios-interview-take-homeTests" */;
+			buildPhases = (
+				FF03074B2E61204A0018506D /* Sources */,
+				FF03074C2E61204A0018506D /* Frameworks */,
+				FF03074D2E61204A0018506D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FF0307542E61204A0018506D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FF0307502E61204A0018506D /* ios-interview-take-homeTests */,
+			);
+			name = "ios-interview-take-homeTests";
+			packageProductDependencies = (
+			);
+			productName = "ios-interview-take-homeTests";
+			productReference = FF03074F2E61204A0018506D /* ios-interview-take-homeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -95,6 +143,10 @@
 				TargetAttributes = {
 					EF4A43572E037CFF004EDA41 = {
 						CreatedOnToolsVersion = 16.1;
+					};
+					FF03074E2E61204A0018506D = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = EF4A43572E037CFF004EDA41;
 					};
 				};
 			};
@@ -113,12 +165,20 @@
 			projectRoot = "";
 			targets = (
 				EF4A43572E037CFF004EDA41 /* ios-interview-take-home */,
+				FF03074E2E61204A0018506D /* ios-interview-take-homeTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		EF4A43562E037CFF004EDA41 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FF03074D2E61204A0018506D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +195,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		FF03074B2E61204A0018506D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FF0307542E61204A0018506D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EF4A43572E037CFF004EDA41 /* ios-interview-take-home */;
+			targetProxy = FF0307532E61204A0018506D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		EF4A436C2E037D00004EDA41 /* Debug */ = {
@@ -311,6 +386,42 @@
 			};
 			name = Release;
 		};
+		FF0307562E61204B0018506D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NRZUW694NF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "alanleatherman.ios-interview-take-homeTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ios-interview-take-home.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ios-interview-take-home";
+			};
+			name = Debug;
+		};
+		FF0307572E61204B0018506D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NRZUW694NF;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "alanleatherman.ios-interview-take-homeTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ios-interview-take-home.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ios-interview-take-home";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -328,6 +439,15 @@
 			buildConfigurations = (
 				EF4A436C2E037D00004EDA41 /* Debug */,
 				EF4A436D2E037D00004EDA41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FF0307552E61204B0018506D /* Build configuration list for PBXNativeTarget "ios-interview-take-homeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF0307562E61204B0018506D /* Debug */,
+				FF0307572E61204B0018506D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

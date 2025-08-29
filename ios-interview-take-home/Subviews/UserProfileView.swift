@@ -4,10 +4,14 @@ struct UserProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.interactors) private var interactors
     @Environment(\.appState) private var appState
+    @Environment(\.container) private var container
+    
     @State private var isEditingName = false
     @State private var editedName = ""
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
+    @State private var showingHelpAlert = false
+    @State private var showingSignOutAlert = false
     
     var body: some View {
         NavigationView {
@@ -18,9 +22,7 @@ struct UserProfileView: View {
                 VStack(spacing: Theme.Spacing.xl) {
                     Spacer()
                     
-                    // Profile image section
                     VStack(spacing: Theme.Spacing.lg) {
-                        // Large profile avatar - tappable
                         Button(action: { showingImagePicker = true }) {
                             Circle()
                                 .fill(Color.gray.opacity(0.3))
@@ -58,7 +60,6 @@ struct UserProfileView: View {
                         .foregroundColor(Theme.Colors.primary)
                     }
                     
-                    // Name section with edit capability
                     VStack(spacing: Theme.Spacing.sm) {
                         if isEditingName {
                             HStack {
@@ -95,7 +96,6 @@ struct UserProfileView: View {
                             .foregroundColor(.gray)
                     }
                     
-                    // Settings options
                     VStack(spacing: Theme.Spacing.md) {
                         SettingsRow(
                             icon: "bell",
@@ -141,7 +141,6 @@ struct UserProfileView: View {
         .onChange(of: selectedImage) { _, newImage in
             if let newImage = newImage {
                 let imageData = newImage.jpegData(compressionQuality: 0.8)
-                // Update both AppState and persist through UserInteractor
                 appState.userState.updateProfileImage(imageData)
                 Task {
                     await interactors.userInteractor.updateProfile(
@@ -177,7 +176,6 @@ struct UserProfileView: View {
         appState.userState.updateUserName(editedName)
         isEditingName = false
         
-        // Persist the name change through UserInteractor
         Task {
             await interactors.userInteractor.updateProfile(
                 name: editedName,
@@ -192,9 +190,6 @@ struct UserProfileView: View {
         }
     }
     
-    @State private var showingHelpAlert = false
-    @State private var showingSignOutAlert = false
-    
     private func showHelpAlert() {
         showingHelpAlert = true
     }
@@ -204,14 +199,7 @@ struct UserProfileView: View {
     }
     
     private func signOut() async {
-        await interactors.userInteractor.signOut()
-        // Clear app state as well
-        appState.userState.hasCompletedOnboarding = false
-        appState.userState.hasShownTypewriter = false
-        appState.userState.userName = "User"
-        appState.userState.profileImage = nil
-        
-        // Dismiss the profile view
+        await container.signOut()
         dismiss()
     }
 }

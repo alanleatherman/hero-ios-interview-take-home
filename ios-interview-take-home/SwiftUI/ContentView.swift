@@ -9,7 +9,6 @@ struct ContentView: View {
     var body: some View {
         Group {
             if isCheckingOnboarding {
-                // Loading state while checking onboarding status
                 VStack(spacing: Theme.Spacing.sm) {
                     ProgressView()
                         .scaleEffect(1.5)
@@ -34,13 +33,10 @@ struct ContentView: View {
             }
         }
         .task {
-            // Check onboarding status on app launch
             await checkOnboardingStatus()
         }
         .onChange(of: appState.userState.hasCompletedOnboarding) { _, newValue in
-            // React to changes in onboarding status (like sign out)
             if !newValue && hasCompletedOnboarding {
-                // User signed out, reset to onboarding
                 hasCompletedOnboarding = false
             }
         }

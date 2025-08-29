@@ -17,6 +17,7 @@ final class UserProfile {
 }
 
 // MARK: - Sample Data
+
 extension UserProfile {
     static let sample = UserProfile(
         name: "John Doe",

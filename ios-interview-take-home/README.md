@@ -110,7 +110,7 @@ Given more time, the following features would enhance the application:
 - **Typing Indicators**: Show when the bot is "typing" a response
 - **Message Status Icons**: Delivered/read indicators for sent messages
 
-### Medium-term Features (4-8 hours)
+### Medium-term Features (Day)
 - **Push Notifications**: Local notifications for new messages when app is backgrounded
 - **Message Reactions**: Emoji reactions to messages
 - **File Attachments**: Support for images, documents, and other media
@@ -118,7 +118,7 @@ Given more time, the following features would enhance the application:
 - **Export Conversations**: Ability to export chat history
 
 ### Advanced Features (1-2 weeks)
-- **Real Backend Integration**: Replace bot simulation with actual messaging service
+- **Real Backend Integration**: Replace bot simulation with actual messaging service, would at this point make the web vs preview repositories more varied
 - **End-to-End Encryption**: Secure message transmission and storage
 - **Group Chats**: Multi-participant conversations
 - **Voice Messages**: Audio recording and playback

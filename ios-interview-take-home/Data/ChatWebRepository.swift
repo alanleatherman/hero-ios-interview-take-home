@@ -1,9 +1,30 @@
 import Foundation
 import SwiftData
 
+enum ChatError: LocalizedError {
+    case persistenceFailure(Error)
+    case networkSimulationFailure
+    case dataCorruption
+    case unknownError(Error)
+    
+    var errorDescription: String? {
+        switch self {
+        case .persistenceFailure:
+            return "Failed to save or load messages"
+        case .networkSimulationFailure:
+            return "Failed to simulate network response"
+        case .dataCorruption:
+            return "Message data appears to be corrupted"
+        case .unknownError(let error):
+            return "An unexpected error occurred: \(error.localizedDescription)"
+        }
+    }
+}
+
 class ChatWebRepository: ChatRepositoryProtocol {
     private var modelContext: ModelContext?
     private var chats: [String: Chat] = [:]
+    private let queue = DispatchQueue(label: "ChatWebRepository", qos: .userInitiated)
     
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext
@@ -12,32 +33,41 @@ class ChatWebRepository: ChatRepositoryProtocol {
     // MARK: - ChatRepositoryProtocol Implementation
     
     func getAllChats() async throws -> [Chat] {
-        do {
-            if let modelContext = modelContext {
-                // Load from SwiftData
-                let descriptor = FetchDescriptor<Chat>()
-                let persistedChats = try modelContext.fetch(descriptor)
-                
-                if persistedChats.isEmpty {
-                    // If no persisted data, setup sample data
-                    let sampleChats = createSampleChats()
-                    for chat in sampleChats {
-                        modelContext.insert(chat)
-                    }
-                    try modelContext.save()
-                    return sampleChats
-                }
-                
-                return persistedChats
-            } else {
-                // Fallback to in-memory storage
+        if let modelContext = modelContext {
+            let descriptor = FetchDescriptor<Chat>()
+            
+            let persistedChats: [Chat]
+            do {
+                persistedChats = try modelContext.fetch(descriptor)
+            } catch {
+                print("SwiftData fetch failed, falling back to in-memory: \(error)")
+
                 if chats.isEmpty {
                     setupSampleData()
                 }
                 return Array(chats.values)
             }
-        } catch {
-            throw ChatError.persistenceFailure(error)
+            
+            if persistedChats.isEmpty {
+                let sampleChats = createSampleChats()
+                do {
+                    for chat in sampleChats {
+                        modelContext.insert(chat)
+                    }
+                    try modelContext.save()
+                    return sampleChats
+                } catch {
+                    print("Failed to save sample data to SwiftData: \(error)")
+                    return sampleChats
+                }
+            }
+            
+            return persistedChats
+        } else {
+            if chats.isEmpty {
+                setupSampleData()
+            }
+            return Array(chats.values)
         }
     }
     
@@ -47,30 +77,20 @@ class ChatWebRepository: ChatRepositoryProtocol {
     }
     
     func sendMessage(_ content: String, to otherUserName: String) async throws -> Message {
-        do {
-            let now = Date()
-            
-            // Create the user's message with current timestamp
-            let message = Message(content: content, isFromCurrentUser: true, timestamp: now)
-            
-            // Add message to chat
-            try await addMessage(message, to: otherUserName)
-            
-            // Simulate network delay
-            try? await Task.sleep(for: .seconds(1))
-            
-            // Get fake response
-            let fakeResponse = await getFakeResponse(for: content)
-            // Ensure response message has a later timestamp
-            let responseMessage = Message(content: fakeResponse, isFromCurrentUser: false, timestamp: now.addingTimeInterval(2))
-            
-            // Add response message
-            try await addMessage(responseMessage, to: otherUserName)
-            
-            return responseMessage
-        } catch {
-            throw ChatError.networkSimulationFailure
-        }
+        let now = Date()
+        let message = Message(content: content, isFromCurrentUser: true, timestamp: now)
+        
+        // Add message to chat
+        try await addMessage(message, to: otherUserName)
+        
+        try? await Task.sleep(for: .seconds(1))
+        
+        let fakeResponse = await getFakeResponse(for: content)
+        let responseMessage = Message(content: fakeResponse, isFromCurrentUser: false, timestamp: now.addingTimeInterval(2))
+        
+        try await addMessage(responseMessage, to: otherUserName)
+        
+        return responseMessage
     }
     
     func loadCachedChats() async throws -> [Chat] {
@@ -96,16 +116,25 @@ class ChatWebRepository: ChatRepositoryProtocol {
     
     private func addMessage(_ message: Message, to otherUserName: String) async throws {
         if let modelContext = modelContext {
-            // SwiftData persistence
             let descriptor = FetchDescriptor<Chat>(predicate: #Predicate<Chat> { chat in
                 chat.otherUserName == otherUserName
             })
             
-            let existingChats = try modelContext.fetch(descriptor)
-            let chat: Chat
+            let existingChats: [Chat]
+            do {
+                existingChats = try modelContext.fetch(descriptor)
+            } catch {
+                print("Failed to fetch existing chat, falling back to in-memory: \(error)")
+
+                if chats[otherUserName] == nil {
+                    chats[otherUserName] = Chat(otherUserName: otherUserName, messages: [])
+                }
+                chats[otherUserName]?.messages.append(message)
+                return
+            }
             
+            let chat: Chat
             if let existingChat = existingChats.first {
-                // Use existing chat
                 chat = existingChat
             } else {
                 // Create new chat if it doesn't exist
@@ -116,14 +145,22 @@ class ChatWebRepository: ChatRepositoryProtocol {
                 modelContext.insert(chat)
             }
             
-            // Set up the relationship
+            modelContext.insert(message)
             message.chat = chat
             chat.messages.append(message)
             
-            // Insert the message
-            modelContext.insert(message)
-            
-            try modelContext.save()
+            do {
+                try modelContext.save()
+            } catch {
+                print("Failed to save message to SwiftData: \(error)")
+                // Remove from SwiftData context if save failed to prevent stale references
+                modelContext.delete(message)
+                // Fallback to in-memory
+                if chats[otherUserName] == nil {
+                    chats[otherUserName] = Chat(otherUserName: otherUserName, messages: [])
+                }
+                chats[otherUserName]?.messages.append(message)
+            }
         } else {
             // Fallback to in-memory storage
             if chats[otherUserName] == nil {
@@ -134,7 +171,6 @@ class ChatWebRepository: ChatRepositoryProtocol {
     }
     
     private func getFakeResponse(for message: String) async -> String {
-        // Simulate network delay for response
         try? await Task.sleep(for: .seconds(1))
         
         let responses = [
@@ -207,6 +243,43 @@ class ChatWebRepository: ChatRepositoryProtocol {
         let sampleChats = createSampleChats()
         for chat in sampleChats {
             chats[chat.otherUserName] = chat
+        }
+    }
+    
+    func clearAllData() async throws {
+        // Clear in-memory storage first
+        chats.removeAll()
+        
+        // Clear SwiftData storage if available
+        if let modelContext = modelContext {
+            do {
+                // Delete all Chat entities
+                let chatDescriptor = FetchDescriptor<Chat>()
+                let allChats = try modelContext.fetch(chatDescriptor)
+                for chat in allChats {
+                    modelContext.delete(chat)
+                }
+                
+                // Delete all Profile entities
+                let profileDescriptor = FetchDescriptor<Profile>()
+                let allProfiles = try modelContext.fetch(profileDescriptor)
+                for profile in allProfiles {
+                    modelContext.delete(profile)
+                }
+                
+                // Delete all Message entities
+                let messageDescriptor = FetchDescriptor<Message>()
+                let allMessages = try modelContext.fetch(messageDescriptor)
+                for message in allMessages {
+                    modelContext.delete(message)
+                }
+                
+                try modelContext.save()
+                print("Cleared all persistent chat data")
+            } catch {
+                print("Failed to clear SwiftData storage: \(error)")
+                // The app can continue functioning with in-memory storage
+            }
         }
     }
     

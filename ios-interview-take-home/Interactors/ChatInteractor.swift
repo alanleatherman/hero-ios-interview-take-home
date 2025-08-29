@@ -24,22 +24,16 @@ class ChatInteractor: ChatInteractorProtocol {
         } catch {
             appState.chatState.setError(error)
             
-            // Log error for debugging
             print("Failed to load chats: \(error.localizedDescription)")
             
-            // Attempt to load cached data as fallback
             await loadCachedChatsAsFallback()
         }
     }
     
     func sendMessage(_ content: String, to otherUserName: String) async {
         do {
-            // Send the message through the repository (this handles persistence)
             _ = try await repository.sendMessage(content, to: otherUserName)
-            
-            // Reload chats to get the updated state with both messages
             await loadChats()
-            
         } catch {
             appState.chatState.setError(error)
             print("Failed to send message: \(error.localizedDescription)")
@@ -57,10 +51,8 @@ class ChatInteractor: ChatInteractorProtocol {
     }
     
     func markChatAsRead(_ chat: Chat) async {
-        // Mark the chat as read
         chat.markAsRead()
         
-        // Persist the change
         do {
             try await repository.saveChat(chat)
         } catch {
@@ -77,6 +69,20 @@ class ChatInteractor: ChatInteractorProtocol {
         }
     }
     
+    func clearAllData() async {
+        appState.chatState.chats = []
+        appState.chatState.selectedChat = nil
+        appState.chatState.clearError()
+        appState.chatState.setLoading(false)
+        
+        do {
+            try await repository.clearAllData()
+            print("Cleared all chat data from app state and persistent storage")
+        } catch {
+            print("Failed to clear persistent chat data: \(error.localizedDescription)")
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func loadCachedChatsAsFallback() async {
@@ -88,7 +94,6 @@ class ChatInteractor: ChatInteractorProtocol {
             }
         } catch {
             print("Failed to load cached chats: \(error.localizedDescription)")
-            // If all else fails, keep the error state but don't crash
         }
     }
 }
@@ -99,4 +104,5 @@ class StubChatInteractor: ChatInteractorProtocol {
     func loadChats() async {}
     func sendMessage(_ content: String, to otherUserName: String) async {}
     func markChatAsRead(_ chat: Chat) async {}
+    func clearAllData() async {}
 }

@@ -8,7 +8,6 @@ final class Message {
     var isFromCurrentUser: Bool
     var timestamp: Date
     
-    // SwiftData relationship
     var chat: Chat?
     
     init(id: UUID = UUID(), content: String, isFromCurrentUser: Bool, timestamp: Date = Date()) {
@@ -20,7 +19,7 @@ final class Message {
 }
 
 // MARK: - Backward Compatibility
-// Maintain existing convenience initializers for compatibility
+
 extension Message {
     convenience init(content: String, isFromCurrentUser: Bool, timestamp: Date) {
         self.init(id: UUID(), content: content, isFromCurrentUser: isFromCurrentUser, timestamp: timestamp)
@@ -28,6 +27,7 @@ extension Message {
 }
 
 // MARK: - Sample Data
+
 extension Message {
     static let sampleSent = Message(
         content: "Hey! How's it going?",

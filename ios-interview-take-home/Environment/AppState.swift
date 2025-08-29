@@ -66,8 +66,6 @@ class ChatState {
     }
     
     func markChatAsViewed(_ chat: Chat) {
-        // This will be called by the ChatScreenView
-        // The actual persistence will be handled by the ChatInteractor
         chat.markAsRead()
     }
 }
@@ -76,7 +74,7 @@ class ChatState {
 
 @Observable
 class UserState {
-    var userName: String = "User"
+    var userName: String = ""
     var profileImage: Data?
     var hasCompletedOnboarding: Bool = false
     var hasShownTypewriter: Bool = false

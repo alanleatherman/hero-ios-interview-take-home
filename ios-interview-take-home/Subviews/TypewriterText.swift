@@ -32,18 +32,15 @@ struct TypewriterText: View {
                 startTypewriterAnimation()
             }
             .onChange(of: text) { _, newText in
-                // Reset animation if text changes
                 resetAnimation()
                 startTypewriterAnimation()
             }
     }
     
     private func startTypewriterAnimation() {
-        // Clear any existing animation
         displayedText = ""
         currentIndex = 0
         
-        // Start after delay
         DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
             animateNextCharacter()
         }
@@ -56,7 +53,6 @@ struct TypewriterText: View {
         displayedText += String(text[index])
         currentIndex += 1
         
-        // Schedule next character
         DispatchQueue.main.asyncAfter(deadline: .now() + speed) {
             animateNextCharacter()
         }

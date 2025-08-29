@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ChatListView: View {
-    
     @Environment(\.appState) private var appState
     @Environment(\.interactors) private var interactors
     
@@ -23,7 +22,7 @@ struct ChatListView: View {
         case "Groups":
             // For now, assume no group chats - could be extended later
             return []
-        default: // "All"
+        default:
             return sortedChats
         }
     }
@@ -35,8 +34,7 @@ struct ChatListView: View {
             
             VStack(spacing: 0) {
                 ChatListHeaderView(
-                    onProfileTap: { showingProfile = true },
-                    selectedTab: $selectedTab
+                    selectedTab: $selectedTab, onProfileTap: { showingProfile = true }
                 )
                 
                 Group {

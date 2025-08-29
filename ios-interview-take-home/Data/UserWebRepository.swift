@@ -1,8 +1,26 @@
 import Foundation
 import SwiftData
 
+enum UserError: LocalizedError {
+    case onboardingDataMissing
+    case profileSaveFailure(Error)
+    case profileLoadFailure(Error)
+    
+    var errorDescription: String? {
+        switch self {
+        case .onboardingDataMissing:
+            return "Onboarding data is missing or corrupted"
+        case .profileSaveFailure:
+            return "Failed to save user profile"
+        case .profileLoadFailure:
+            return "Failed to load user profile"
+        }
+    }
+}
+
 class UserWebRepository: UserRepositoryProtocol {
     private var modelContext: ModelContext?
+    private let queue = DispatchQueue(label: "UserWebRepository", qos: .userInitiated)
     
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext
@@ -30,17 +48,14 @@ class UserWebRepository: UserRepositoryProtocol {
         }
         
         do {
-            // Check if user profile already exists
             let descriptor = FetchDescriptor<UserProfile>()
             let existingProfiles = try modelContext.fetch(descriptor)
             
             if let existingProfile = existingProfiles.first {
-                // Update existing profile
                 existingProfile.name = name
                 existingProfile.profileImage = profileImage
                 existingProfile.hasCompletedOnboarding = true
             } else {
-                // Create new profile
                 let newProfile = UserProfile(
                     name: name,
                     profileImage: profileImage,

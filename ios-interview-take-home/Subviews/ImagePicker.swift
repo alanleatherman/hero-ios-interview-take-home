@@ -2,16 +2,17 @@ import SwiftUI
 import PhotosUI
 
 struct ImagePicker: View {
-    let onImageSelected: (UIImage) -> Void
     @Environment(\.dismiss) private var dismiss
+    
     @State private var selectedItem: PhotosPickerItem?
+    
+    let onImageSelected: (UIImage) -> Void
     
     var body: some View {
         NavigationView {
             VStack(spacing: Theme.Spacing.xl) {
                 Spacer()
                 
-                // Camera icon
                 Image(systemName: "camera.fill")
                     .font(.system(size: 80))
                     .foregroundColor(Theme.Colors.primary)
@@ -27,7 +28,6 @@ struct ImagePicker: View {
                         .multilineTextAlignment(.center)
                 }
                 
-                // Photo picker
                 PhotosPicker(
                     selection: $selectedItem,
                     matching: .images,
@@ -45,7 +45,6 @@ struct ImagePicker: View {
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
                 
-                // Simulator note
                 Text("📱 In simulator: This will open the photo library")
                     .font(Theme.Typography.caption2)
                     .foregroundColor(.gray)

@@ -17,6 +17,7 @@ final class Profile {
 }
 
 // MARK: - Sample Data
+
 extension Profile {
     static let samples = [
         Profile(name: "Alice", emoji: "😊", isOnline: true),

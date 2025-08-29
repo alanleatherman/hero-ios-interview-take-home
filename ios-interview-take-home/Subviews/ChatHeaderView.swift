@@ -7,7 +7,6 @@ struct ChatHeaderView: View {
     
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {
-            // Back button
             Button(action: onBackTap) {
                 Image(systemName: "chevron.left")
                     .font(.title2)
@@ -15,10 +14,8 @@ struct ChatHeaderView: View {
                     .foregroundColor(.white)
             }
             
-            // Profile section - tappable
             Button(action: onProfileTap) {
                 HStack(spacing: Theme.Spacing.sm) {
-                    // Profile avatar with online indicator
                     ZStack(alignment: .bottomTrailing) {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
@@ -28,7 +25,6 @@ struct ChatHeaderView: View {
                                     .font(.title2)
                             )
                         
-                        // Online status indicator
                         if chat.profile?.isOnline == true {
                             Circle()
                                 .fill(Theme.Colors.success)
@@ -55,7 +51,6 @@ struct ChatHeaderView: View {
             
             Spacer()
             
-            // Menu button only
             Button(action: {}) {
                 Image(systemName: "ellipsis")
                     .font(.title3)
@@ -65,7 +60,6 @@ struct ChatHeaderView: View {
         .padding(.horizontal, Theme.Spacing.md)
         .padding(.vertical, Theme.Spacing.sm)
         .background(
-            // Dark header background like in screenshots
             Color.black
                 .ignoresSafeArea(edges: .top)
         )

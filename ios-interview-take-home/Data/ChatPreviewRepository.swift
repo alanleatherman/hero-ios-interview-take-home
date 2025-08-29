@@ -10,7 +10,6 @@ class ChatPreviewRepository: ChatRepositoryProtocol {
     // MARK: - ChatRepositoryProtocol Implementation
     
     func getAllChats() async throws -> [Chat] {
-        // Simulate slight delay for realistic preview behavior
         try? await Task.sleep(for: .milliseconds(100))
         return mockChats
     }
@@ -20,10 +19,8 @@ class ChatPreviewRepository: ChatRepositoryProtocol {
     }
     
     func sendMessage(_ content: String, to otherUserName: String) async throws -> Message {
-        // Create the user's message
         let message = Message(content: content, isFromCurrentUser: true, timestamp: Date())
         
-        // Find or create chat
         var chat = mockChats.first { $0.otherUserName == otherUserName }
         if chat == nil {
             let profile = Profile(name: otherUserName, emoji: getRandomEmoji(), isOnline: true)
@@ -31,17 +28,12 @@ class ChatPreviewRepository: ChatRepositoryProtocol {
             mockChats.append(chat!)
         }
         
-        // Add user message
         chat?.messages.append(message)
         
-        // Simulate network delay
         try? await Task.sleep(for: .milliseconds(500))
         
-        // Create fake response
         let fakeResponse = getFakeResponse(for: content)
         let responseMessage = Message(content: fakeResponse, isFromCurrentUser: false, timestamp: Date())
-        
-        // Add response message
         chat?.messages.append(responseMessage)
         
         return responseMessage
@@ -52,12 +44,15 @@ class ChatPreviewRepository: ChatRepositoryProtocol {
     }
     
     func saveChat(_ chat: Chat) async throws {
-        // For preview repository, just update in-memory storage
         if let index = mockChats.firstIndex(where: { $0.otherUserName == chat.otherUserName }) {
             mockChats[index] = chat
         } else {
             mockChats.append(chat)
         }
+    }
+    
+    func clearAllData() async throws {
+        mockChats.removeAll()
     }
     
     // MARK: - Private Methods

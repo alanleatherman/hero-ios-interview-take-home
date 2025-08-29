@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct ModernChatRowView: View {
-    let chat: Chat
     @Environment(\.appState) private var appState
+
+    let chat: Chat
     
     var body: some View {
         HStack(spacing: Theme.Spacing.md) {

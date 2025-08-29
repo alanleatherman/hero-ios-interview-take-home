@@ -9,14 +9,12 @@ struct ProfileImageButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
-                // Breathing background circle
                 Circle()
                     .fill(Theme.Colors.primary.opacity(0.1))
                     .frame(width: 120, height: 120)
                     .scaleEffect(isBreathing ? 1.1 : 1.0)
                     .animation(Theme.Animation.breathing, value: isBreathing)
                 
-                // Main profile image container
                 Group {
                     if let selectedImage = selectedImage {
                         Image(uiImage: selectedImage)
@@ -38,7 +36,6 @@ struct ProfileImageButton: View {
                 )
                 .themeShadow(Theme.Shadows.medium)
                 
-                // Add icon overlay when no image is selected
                 if selectedImage == nil {
                     VStack {
                         Spacer()

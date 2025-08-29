@@ -1,16 +1,16 @@
 import SwiftUI
 
 struct ChatListHeaderView: View {
-    let onProfileTap: () -> Void
+    @Environment(\.appState) private var appState
+    
     @Binding var selectedTab: String
     @State private var currentTime = Date()
-    @Environment(\.appState) private var appState
+    
+    let onProfileTap: () -> Void
     
     var body: some View {
         VStack(spacing: Theme.Spacing.md) {
-            // Top section with logo and profile
             HStack {
-                // App logo/name
                 HStack(spacing: 4) {
                     Text("Messages")
                         .font(.title2)
@@ -24,7 +24,6 @@ struct ChatListHeaderView: View {
                 
                 Spacer()
                 
-                // Notification and profile buttons
                 HStack(spacing: Theme.Spacing.sm) {
                     Button(action: {}) {
                         ZStack {
@@ -32,7 +31,6 @@ struct ChatListHeaderView: View {
                                 .font(.title3)
                                 .foregroundColor(.white)
                             
-                            // Notification badge - only show if there are unread messages
                             if appState.chatState.totalUnreadCount > 0 {
                                 Circle()
                                     .fill(Theme.Colors.primary)
@@ -65,12 +63,10 @@ struct ChatListHeaderView: View {
                 }
             }
             
-            // Greeting section (like in middle screenshot)
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         if appState.userState.hasShownTypewriter {
-                            // Show static text after first time
                             Text(greetingText)
                                 .font(Theme.Typography.largeTitle)
                                 .foregroundColor(.white)
@@ -79,7 +75,6 @@ struct ChatListHeaderView: View {
                                 .font(Theme.Typography.largeTitle)
                                 .foregroundColor(.white)
                         } else {
-                            // Show typewriter effect only first time
                             TypewriterText.themed(
                                 greetingText,
                                 style: .largeTitle,
@@ -103,7 +98,6 @@ struct ChatListHeaderView: View {
                     
                     Spacer()
                     
-                    // Sun/moon icon based on time
                     Image(systemName: timeBasedIcon)
                         .font(.title)
                         .foregroundColor(.yellow)
@@ -111,7 +105,6 @@ struct ChatListHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            // Filter tabs (removed Calls, added functionality)
             HStack(spacing: Theme.Spacing.sm) {
                 FilterTab(
                     title: "All", 
@@ -141,7 +134,6 @@ struct ChatListHeaderView: View {
                 currentTime = Date()
             }
             
-            // Mark typewriter as shown after delay
             if !appState.userState.hasShownTypewriter {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                     appState.userState.markTypewriterShown()
@@ -204,7 +196,7 @@ struct FilterTab: View {
 }
 
 #Preview {
-    ChatListHeaderView(onProfileTap: {}, selectedTab: .constant("All"))
+    ChatListHeaderView(selectedTab: .constant("All"), onProfileTap: {})
         .background(Color.black)
         .inject(AppContainer(
             appState: AppState(),

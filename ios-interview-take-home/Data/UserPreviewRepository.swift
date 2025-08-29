@@ -4,30 +4,24 @@ class UserPreviewRepository: UserRepositoryProtocol {
     private var mockUserProfile: UserProfile?
     
     init() {
-        // For previews, we can start with either completed or not completed onboarding
-        // This allows us to test both states in previews
         setupMockData()
     }
     
     // MARK: - UserRepositoryProtocol Implementation
     
     func hasCompletedOnboarding() async throws -> Bool {
-        // Simulate slight delay for realistic preview behavior
         try? await Task.sleep(for: .milliseconds(50))
         return mockUserProfile?.hasCompletedOnboarding ?? false
     }
     
     func saveUserProfile(name: String, profileImage: Data?) async throws {
-        // Simulate save delay
         try? await Task.sleep(for: .milliseconds(100))
         
         if mockUserProfile != nil {
-            // Update existing profile
             mockUserProfile?.name = name
             mockUserProfile?.profileImage = profileImage
             mockUserProfile?.hasCompletedOnboarding = true
         } else {
-            // Create new profile
             mockUserProfile = UserProfile(
                 name: name,
                 profileImage: profileImage,
@@ -37,13 +31,11 @@ class UserPreviewRepository: UserRepositoryProtocol {
     }
     
     func getUserProfile() async throws -> UserProfile? {
-        // Simulate slight delay
         try? await Task.sleep(for: .milliseconds(50))
         return mockUserProfile
     }
     
     func clearUserProfile() async throws {
-        // Simulate save delay
         try? await Task.sleep(for: .milliseconds(100))
         mockUserProfile = nil
     }

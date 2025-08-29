@@ -7,7 +7,6 @@ import Foundation
 class UserInteractor: UserInteractorProtocol {
     private let repository: UserRepositoryProtocol
     
-    // Observable properties for UI binding
     var isLoading = false
     var error: Error?
     var currentUserProfile: UserProfile?
@@ -21,8 +20,6 @@ class UserInteractor: UserInteractorProtocol {
     nonisolated func hasCompletedOnboarding() async -> Bool {
         do {
             let completed = try await repository.hasCompletedOnboarding()
-            
-            // Also load the user profile if onboarding is completed
             if completed {
                 await loadUserProfile()
             }
@@ -43,8 +40,6 @@ class UserInteractor: UserInteractorProtocol {
         
         do {
             try await repository.saveUserProfile(name: name, profileImage: profileImage)
-            
-            // Load the saved profile
             await loadUserProfile()
             
             isLoading = false
@@ -124,7 +119,7 @@ class UserInteractor: UserInteractorProtocol {
             return "Name must be at least 2 characters long"
         }
         
-        return nil // No validation errors
+        return nil
     }
     
     func signOut() async {
