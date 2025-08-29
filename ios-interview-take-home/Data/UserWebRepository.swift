@@ -18,9 +18,9 @@ enum UserError: LocalizedError {
     }
 }
 
+@MainActor
 class UserWebRepository: UserRepositoryProtocol {
     private var modelContext: ModelContext?
-    private let queue = DispatchQueue(label: "UserWebRepository", qos: .userInitiated)
     
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext

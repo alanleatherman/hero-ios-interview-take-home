@@ -21,10 +21,10 @@ enum ChatError: LocalizedError {
     }
 }
 
+@MainActor
 class ChatWebRepository: ChatRepositoryProtocol {
     private var modelContext: ModelContext?
     private var chats: [String: Chat] = [:]
-    private let queue = DispatchQueue(label: "ChatWebRepository", qos: .userInitiated)
     
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext

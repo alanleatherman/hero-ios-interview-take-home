@@ -17,7 +17,7 @@ class UserInteractor: UserInteractorProtocol {
     
     // MARK: - UserInteractorProtocol Implementation
     
-    nonisolated func hasCompletedOnboarding() async -> Bool {
+    func hasCompletedOnboarding() async -> Bool {
         do {
             let completed = try await repository.hasCompletedOnboarding()
             if completed {
@@ -27,9 +27,7 @@ class UserInteractor: UserInteractorProtocol {
             return completed
         } catch {
             print("Failed to check onboarding status: \(error.localizedDescription)")
-            await MainActor.run {
-                self.error = error
-            }
+            self.error = error
             return false
         }
     }
@@ -50,18 +48,14 @@ class UserInteractor: UserInteractorProtocol {
         }
     }
     
-    nonisolated func getUserProfile() async -> UserProfile? {
+    func getUserProfile() async -> UserProfile? {
         do {
             let profile = try await repository.getUserProfile()
-            await MainActor.run {
-                self.currentUserProfile = profile
-            }
+            self.currentUserProfile = profile
             return profile
         } catch {
             print("Failed to get user profile: \(error.localizedDescription)")
-            await MainActor.run {
-                self.error = error
-            }
+            self.error = error
             return nil
         }
     }

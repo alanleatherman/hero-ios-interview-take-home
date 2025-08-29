@@ -32,6 +32,7 @@ struct AppEnvironment {
 }
 
 extension AppEnvironment {
+    @MainActor
     static func bootstrap(_ optionOverride: AppEnvironment.Option? = nil, modelContext: ModelContext? = nil) -> AppEnvironment {
         let option = optionOverride ?? AppEnvironment.current
         Logger.app.info("Current environment: \(option.rawValue)")

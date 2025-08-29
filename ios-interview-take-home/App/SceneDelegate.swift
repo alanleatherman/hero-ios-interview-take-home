@@ -22,15 +22,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // SwiftUI with Environment Bootstrap
         let modelContainer = SwiftDataConfiguration.createModelContainer()
-        let modelContext = ModelContext(modelContainer)
-        let environment = AppEnvironment.bootstrap(modelContext: modelContext)
+        let environment = AppEnvironment.bootstrap(modelContext: modelContainer.mainContext)
         let contentView = ContentView()
             .inject(environment.appContainer)
             .modelContainer(modelContainer)
         
         window?.rootViewController = UIHostingController(rootView: contentView)
-        
         window?.makeKeyAndVisible()
+
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
